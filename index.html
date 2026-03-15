@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>NERV // 大気質監視端末</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Bebas+Neue&display=swap"
+        rel="stylesheet">
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="hazard-border-top"></div>
+
+    <div id="topbar">
+        <div>
+            <div class="logo">NERV</div>
+            <div class="logo-sub">AQI OPS CONSOLE v9.2</div>
+        </div>
+        <div class="sep"></div>
+        <div id="ac-wrap">
+            <input class="scan-inp" id="loc-inp" placeholder="City — or — lat, lng — or — click map" autocomplete="off">
+            <div id="ac-drop"></div>
+        </div>
+        <button class="btn btn-p" id="scan-btn">▶ SCAN</button>
+        <div class="topbar-r">
+            <div class="clock" id="clk">--:--:--</div>
+            <div class="top-sys">SYS: <b id="sys-stat" style="color:var(--gr)">STANDBY</b> // MAGI-01</div>
+        </div>
+    </div>
+
+    <div id="main">
+        <div id="left" class="nerv-panel">
+            <div class="phdr phdr-rd"><span>◆ CURRENT STATUS</span></div>
+            <div class="aqi-big-wrap">
+                <div class="aqi-num" id="c-aqi">—</div>
+                <div class="aqi-right">
+                    <div class="aqi-status" id="c-stat">—</div>
+                    <div class="aqi-cat" id="c-cat">US AQI</div>
+                    <div class="aqi-stamp" id="c-stamp">STANDBY</div>
+                </div>
+            </div>
+            <div class="sev-wrap">
+                <div class="plbl">SEVERITY</div>
+                <div class="sev-row" id="sev-row">
+                    <div class="sev-blk"></div>
+                    <div class="sev-blk"></div>
+                    <div class="sev-blk"></div>
+                    <div class="sev-blk"></div>
+                    <div class="sev-blk"></div>
+                </div>
+            </div>
+            <div class="pscroll">
+                <div class="psec">
+                    <div class="plbl">LOCATION</div>
+                    <div class="pval" id="c-loc">—</div>
+                </div>
+                <div class="psec">
+                    <div class="plbl">COORDINATES</div>
+                    <div class="pval" id="c-coords">—</div>
+                </div>
+                <div class="psec">
+                    <div class="plbl">DATA TIME</div>
+                    <div class="pval" id="c-ts">—</div>
+                </div>
+                <div class="psec">
+                    <div class="plbl">DOMINANT</div>
+                    <div class="pval" id="c-dom">—</div>
+                </div>
+                <div class="psec">
+                    <div class="plbl">EU AQI</div>
+                    <div class="pval" id="c-eaqi">—</div>
+                </div>
+                <div class="psec" style="border-bottom:none">
+                    <div class="plbl">UV INDEX</div>
+                    <div class="pval" id="c-uv">—</div>
+                </div>
+                <div class="phdr" style="margin-top:4px"><span>◆ POLLUTANTS</span></div>
+                <div class="vbars-wrap">
+                    <div class="vbars-row" id="vbars-row"></div>
+                </div>
+                <div class="pol-detail" id="pol-detail">
+                    <div class="pd-row">
+                        <div>
+                            <div class="pd-lbl" id="pd-name">—</div>
+                        </div>
+                        <div>
+                            <div class="pd-lbl">WHO GUIDELINE</div>
+                            <div class="pd-val" id="pd-who">—</div>
+                        </div>
+                        <div>
+                            <div class="pd-lbl">SOURCES</div>
+                            <div class="pd-val" id="pd-src">—</div>
+                        </div>
+                        <div>
+                            <div class="pd-lbl">HEALTH EFFECTS</div>
+                            <div class="pd-val" id="pd-fx">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="map-wrap" class="nerv-panel"></div>
+
+        <div id="right" class="nerv-panel">
+            <div class="phdr">
+                <span>◆ SCAN LOG</span>
+                <button class="btn-clear" id="clear-btn">CLEAR</button>
+            </div>
+            <div class="pscroll" id="scan-log">
+                <div style="padding:20px;font-size:13px;color:var(--mid);letter-spacing:1px;font-weight:700;">AWAITING
+                    FIRST SCAN...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="wave-sec" class="nerv-panel">
+        <div class="phdr" style="flex-shrink:0; background:var(--panel);"><span>◆ AQI WAVEFORM — 48H · PAST
+                ─── FORECAST ╌╌╌</span></div>
+        <div id="wave-tabs">
+            <button class="wtab on" data-wk="us_aqi">US AQI</button>
+            <button class="wtab" data-wk="pm2_5">PM2.5</button>
+            <button class="wtab" data-wk="pm10">PM10</button>
+            <button class="wtab" data-wk="ozone">O₃</button>
+            <button class="wtab" data-wk="nitrogen_dioxide">NO₂</button>
+            <button class="wtab" data-wk="sulphur_dioxide">SO₂</button>
+            <button class="wtab" data-wk="carbon_monoxide">CO</button>
+        </div>
+        <div id="wave-inner"><svg id="wave-svg"></svg></div>
+    </div>
+
+    <div id="mobile-tabs">
+        <button class="mtab act" data-mt="left">DATA</button>
+        <button class="mtab" data-mt="right">LOG</button>
+    </div>
+
+    <div id="sbar">
+        <div style="display:flex;align-items:center"><span class="led led-gr" id="led"></span><span id="sbar-s"
+                style="color:var(--st);font-weight:700;">SYSTEM READY</span></div>
+        <span style="letter-spacing: 2px;">NERV // OPEN-METEO × MAPLIBRE</span>
+        <span id="sbar-r" style="font-weight:700;color:var(--or-dim);"></span>
+    </div>
+
+    <div class="hazard-border-bot"></div>
+    <div id="err-box"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
