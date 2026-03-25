@@ -1,0 +1,70 @@
+/* --- NERV GEO-MONITOR — WAVEFORM CHART --- */
+/* Styles for the AQI waveform SVG chart inside #hud-chart. */
+
+/* ============================================================
+   WAVE TABS — pollutant selector row
+   ============================================================ */
+#wave-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 6px 14px;
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+#wave-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+/* --- Individual tab button --- */
+.wtab {
+    font-family: var(--stamp);
+    font-size: 15px;
+    letter-spacing: 2px;
+    padding: 3px 12px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--mid);
+    transition: all 0.12s;
+    flex-shrink: 0;
+    clip-path: polygon(
+        var(--notch-sm) 0,
+        100% 0,
+        100% calc(100% - var(--notch-sm)),
+        calc(100% - var(--notch-sm)) 100%,
+        0 100%,
+        0 var(--notch-sm)
+    );
+}
+
+.wtab:hover {
+    border-color: var(--cy);
+    color: var(--cy);
+    background: rgba(32, 240, 255, 0.05);
+}
+
+.wtab.on {
+    border-color: var(--or);
+    color: var(--or);
+    background: rgba(255, 152, 48, 0.08);
+    text-shadow: 0 0 6px rgba(255, 152, 48, 0.4);
+}
+
+/* ============================================================
+   WAVE SVG CANVAS AREA
+   ============================================================ */
+#wave-inner {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#wave-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}

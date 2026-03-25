@@ -1,0 +1,397 @@
+/* --- NERV GEO-MONITOR — HUD OVERLAY POSITIONS & AQI STYLES --- */
+/* Defines fixed positions for floating HUD panels and all data display components. */
+
+/* ============================================================
+   HUD LEFT — AQI Data Panel
+   NOTE: .nerv-marker, .nerv-marker-ring, .nerv-marker-dot
+         CSS is also defined here (used by src/map/marker.js)
+   ============================================================ */
+#hud-left {
+    position: fixed;
+    top: calc(var(--topbar-height) + 6px + var(--hud-gap));
+    left: var(--hud-gap);
+    width: 340px;
+    bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
+    z-index: var(--z-hud);
+}
+
+/* ============================================================
+   HUD RIGHT — Scan Log Panel
+   ============================================================ */
+#hud-right {
+    position: fixed;
+    top: calc(var(--topbar-height) + 6px + var(--hud-gap));
+    right: var(--hud-gap);
+    width: 300px;
+    bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
+    z-index: var(--z-hud);
+}
+
+/* ============================================================
+   HUD CHART — Waveform Panel (bottom-center)
+   ============================================================ */
+#hud-chart {
+    position: fixed;
+    bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
+    left: calc(340px + var(--hud-gap) * 2);
+    right: calc(300px + var(--hud-gap) * 2);
+    height: 180px;
+    z-index: var(--z-hud);
+}
+
+/* ============================================================
+   AQI DISPLAY — big number + status
+   ============================================================ */
+.aqi-big-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.aqi-num {
+    font-family: var(--stamp);
+    font-size: 72px;
+    line-height: 1;
+    color: var(--or);
+    text-shadow: 0 0 20px rgba(255, 152, 48, 0.5);
+    letter-spacing: 2px;
+    flex-shrink: 0;
+}
+
+.aqi-right {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.aqi-status {
+    font-family: var(--stamp);
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--gr);
+    text-shadow: 0 0 8px rgba(80, 255, 80, 0.35);
+}
+
+.aqi-cat {
+    font-size: 10px;
+    color: var(--mid);
+    letter-spacing: 2px;
+}
+
+.aqi-stamp {
+    font-family: var(--stamp);
+    font-size: 13px;
+    color: var(--mid);
+    letter-spacing: 2px;
+}
+
+/* ============================================================
+   SEVERITY INDICATOR — coloured block row
+   ============================================================ */
+.sev-wrap {
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.sev-row {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.sev-blk {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    transition: background 0.4s;
+}
+
+/* ============================================================
+   WEATHER ROW (new)
+   ============================================================ */
+.weather-row {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.weather-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px 6px;
+    border-right: 1px solid var(--border);
+}
+
+.weather-item:last-child {
+    border-right: none;
+}
+
+.weather-val {
+    font-family: var(--stamp);
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: var(--cy);
+    text-shadow: 0 0 6px rgba(32, 240, 255, 0.25);
+}
+
+.weather-lbl {
+    font-size: 9px;
+    color: var(--mid);
+    letter-spacing: 1.5px;
+    margin-top: 2px;
+}
+
+/* ============================================================
+   POLLUTANT BARS (vertical)
+   ============================================================ */
+.vbars-wrap {
+    padding: 16px 20px 12px;
+    flex-shrink: 0;
+}
+
+.vbars-row {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+}
+
+.vbw {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.vbar {
+    width: 100%;
+    height: 80px;
+    position: relative;
+    overflow: hidden;
+    background: var(--dim);
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+}
+
+.vbw:hover .vbar {
+    border-color: var(--or);
+    box-shadow: 0 0 10px rgba(255, 138, 0, 0.2);
+}
+
+.vbw.act .vbar {
+    border-color: var(--cy);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+}
+
+.vbf {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    transition: height 1.2s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.vb-n {
+    font-size: 12px;
+    color: var(--or);
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+.vb-v {
+    font-size: 11px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.vb-u {
+    font-size: 9px;
+    color: var(--mid);
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* ============================================================
+   POLLUTANT DETAIL PANEL
+   ============================================================ */
+.pol-detail {
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    display: none;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.pol-detail.show {
+    display: block;
+}
+
+.pd-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pd-lbl {
+    font-size: 10px;
+    color: var(--or);
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+}
+
+.pd-val {
+    font-size: 13px;
+    color: var(--st);
+    line-height: 1.6;
+    margin-top: 4px;
+}
+
+.pd-who-ok {
+    color: var(--gr);
+    font-weight: 700;
+}
+
+.pd-who-ex {
+    color: var(--rd);
+    font-weight: 700;
+    text-shadow: 0 0 5px rgba(255, 42, 42, 0.4);
+}
+
+/* ============================================================
+   SCAN LOG ENTRIES
+   ============================================================ */
+.log-e {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s;
+    border-left: 3px solid transparent;
+}
+
+.log-e:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.log-e.cur {
+    background: rgba(255, 138, 0, 0.05);
+    border-left-color: var(--ac);
+}
+
+.log-ts {
+    font-size: 11px;
+    color: var(--mid);
+    letter-spacing: 1px;
+}
+
+.log-nm {
+    font-size: 15px;
+    color: var(--or);
+    margin-top: 6px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.log-aq {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.log-aql {
+    color: var(--mid);
+}
+
+.log-aqv {
+    font-weight: 700;
+    font-family: var(--stamp);
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   LED STATUS DOTS
+   ============================================================ */
+.led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+    box-shadow: 0 0 5px currentColor;
+}
+
+.led-gr {
+    background: var(--gr);
+    color: var(--gr);
+}
+
+.led-or {
+    background: var(--or);
+    color: var(--or);
+    animation: blink 1s infinite;
+}
+
+.led-rd {
+    background: var(--rd);
+    color: var(--rd);
+    animation: blink 0.5s infinite;
+}
+
+/* ============================================================
+   ERROR OVERLAY BOX
+   ============================================================ */
+#err-box {
+    position: fixed;
+    bottom: calc(var(--terminal-height) + 20px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--z-overlay);
+    background: rgba(20, 0, 0, 0.95);
+    border: 1px solid var(--rd);
+    color: var(--rd);
+    padding: 12px 24px;
+    font-size: 14px;
+    display: none;
+    white-space: nowrap;
+    box-shadow: 0 0 20px rgba(255, 42, 42, 0.35);
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   NERV MAP MARKER
+   NOTE: These classes are instantiated inside src/map/marker.js
+   ============================================================ */
+.nerv-marker {
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.nerv-marker-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    animation: ring-pulse 1.5s ease-out infinite;
+}
+
+.nerv-marker-dot {
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    background: currentColor;
+}

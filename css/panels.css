@@ -1,0 +1,190 @@
+/* --- NERV GEO-MONITOR — PANEL COMPONENTS --- */
+/* Glassmorphism floating HUD panels with NERV clip-path notched corners. */
+
+/* ============================================================
+   BASE PANEL — .nerv-panel
+   All floating HUD elements extend this class.
+   clip-path cuts top-right and bottom-left corners (NERV signature).
+   ============================================================ */
+.nerv-panel {
+    position: absolute;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    /* Notched corners: top-right and bottom-left */
+    clip-path: polygon(
+        0 0,
+        calc(100% - var(--notch)) 0,
+        100% var(--notch),
+        100% 100%,
+        var(--notch) 100%,
+        0 calc(100% - var(--notch))
+    );
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Inset depth border via ::after pseudo-element */
+.nerv-panel::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    pointer-events: none;
+    /* 1px inset border for glass depth */
+    clip-path: polygon(
+        0 0,
+        calc(100% - var(--notch)) 0,
+        100% var(--notch),
+        100% 100%,
+        var(--notch) 100%,
+        0 calc(100% - var(--notch))
+    );
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    z-index: 1;
+}
+
+/* --- PANEL MODIFIER — left-anchored panels --- */
+/* Flips the notch: top-left and bottom-right corners instead */
+.nerv-panel--tl {
+    clip-path: polygon(
+        var(--notch) 0,
+        100% 0,
+        100% calc(100% - var(--notch)),
+        calc(100% - var(--notch)) 100%,
+        0 100%,
+        0 var(--notch)
+    );
+}
+
+.nerv-panel--tl::after {
+    clip-path: polygon(
+        var(--notch) 0,
+        100% 0,
+        100% calc(100% - var(--notch)),
+        calc(100% - var(--notch)) 100%,
+        0 100%,
+        0 var(--notch)
+    );
+}
+
+/* ============================================================
+   PANEL HEADER — .phdr
+   ============================================================ */
+.phdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255, 152, 48, 0.06);
+    flex-shrink: 0;
+}
+
+.phdr span {
+    font-family: var(--stamp);
+    font-size: 17px;
+    letter-spacing: 3px;
+    color: var(--or);
+    text-shadow: 0 0 8px rgba(255, 152, 48, 0.4);
+}
+
+/* --- RED-TINTED variant (for "current status" header) --- */
+.phdr-rd {
+    background: rgba(255, 48, 48, 0.06);
+}
+
+.phdr-rd span {
+    color: var(--rd);
+    text-shadow: 0 0 8px rgba(255, 48, 48, 0.35);
+}
+
+/* ============================================================
+   SCROLLABLE PANEL BODY — .pscroll
+   ============================================================ */
+.pscroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+.pscroll::-webkit-scrollbar {
+    width: 3px;
+}
+
+.pscroll::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+.pscroll::-webkit-scrollbar-thumb:hover {
+    background: var(--mid);
+}
+
+/* ============================================================
+   PANEL DATA CELLS — .psec, .plbl, .pval
+   ============================================================ */
+.psec {
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.plbl {
+    font-size: 10px;
+    color: var(--or);
+    letter-spacing: 2px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+
+.pval {
+    font-size: 14px;
+    color: var(--st);
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    text-align: right;
+}
+
+/* ============================================================
+   CLEAR BUTTON — inside panel headers
+   ============================================================ */
+.btn-clear {
+    font-family: var(--stamp);
+    font-size: 13px;
+    letter-spacing: 2px;
+    padding: 2px 10px;
+    border: 1px solid var(--border);
+    color: var(--mid);
+    background: transparent;
+    transition: all 0.12s;
+    clip-path: polygon(
+        var(--notch-sm) 0, 100% 0,
+        100% calc(100% - var(--notch-sm)),
+        calc(100% - var(--notch-sm)) 100%,
+        0 100%, 0 var(--notch-sm)
+    );
+}
+
+.btn-clear:hover {
+    border-color: var(--rd);
+    color: var(--rd);
+    background: rgba(255, 48, 48, 0.08);
+}
+
+/* ============================================================
+   SEVERITY LEVEL — body class overrides
+   Panel glow animations on elevated AQI conditions.
+   ============================================================ */
+body.lv3 .nerv-panel,
+body.lv4 .nerv-panel,
+body.lv5 .nerv-panel {
+    animation: pulse-a 2s infinite;
+}
+
+body.lv5 .nerv-panel {
+    border-color: var(--pu);
+}

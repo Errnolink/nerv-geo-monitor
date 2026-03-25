@@ -1,0 +1,51 @@
+/* --- NERV GEO-MONITOR — CSS DESIGN TOKENS --- */
+/* All custom properties (design tokens) used throughout the application. */
+
+:root {
+
+    /* --- BRAND COLORS --- */
+    --or:   #FF9830;        /* Orange — primary accent, warnings */
+    --or-dim: #8A4A00;      /* Orange dim — muted variant */
+    --gr:   #50FF50;        /* Green — OK / online indicators */
+    --gr-dim: #184D18;      /* Green dim */
+    --cy:   #20F0FF;        /* Cyan — highlights, active states */
+    --cy-dim: #005A66;      /* Cyan dim */
+    --rd:   #FF3030;        /* Red — errors, critical alerts */
+    --rd-dim: #660000;      /* Red dim */
+    --pu:   #B020FF;        /* Purple — Lv5 hazard */
+    --pu-dim: #3A005A;      /* Purple dim */
+
+    /* --- NEUTRALS --- */
+    --bg:     #0A0A0C;      /* Page background */
+    --panel:  #0D0D0D;      /* Panel background */
+    --border: #222228;      /* Standard border */
+    --mid:    #555566;      /* Mid-tone text / inactive */
+    --dim:    #111116;      /* Slightly elevated dark surface */
+    --st:     #D8D8D0;      /* Standard body text */
+
+    /* --- TYPOGRAPHY --- */
+    --mono:  'IBM Plex Mono', 'Courier New', monospace;
+    --stamp: 'Bebas Neue', 'Arial Narrow', sans-serif;
+    --ac:    var(--or);     /* Accent alias */
+
+    /* --- GLASSMORPHISM TOKENS (new) --- */
+    --glass-bg:     rgba(10, 10, 12, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-blur:   18px;
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+
+    /* --- LAYOUT TOKENS (new) --- */
+    --notch:    12px;       /* Default clip-path corner notch size */
+    --notch-sm: 8px;        /* Small notch variant */
+    --hud-gap:  12px;       /* Gap between floating HUD panels */
+
+    /* --- DIMENSIONS (new) --- */
+    --terminal-height: 220px;
+    --topbar-height:   54px;
+
+    /* --- Z-INDEX LAYERS (new) --- */
+    --z-map:     0;
+    --z-hud:     100;
+    --z-terminal: 200;
+    --z-overlay: 9999;
+}

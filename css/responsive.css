@@ -1,0 +1,157 @@
+/* --- NERV GEO-MONITOR — RESPONSIVE LAYOUT --- */
+/* Breakpoints to adapt the floating HUD for smaller viewports. */
+
+/* ============================================================
+   MOBILE TABS — hidden by default on desktop
+   ============================================================ */
+#mobile-tabs {
+    display: none;
+}
+
+/* ============================================================
+   TABLET / SMALL DESKTOP — max-width: 900px
+   ============================================================ */
+@media (max-width: 900px) {
+
+    /* --- Hide right scan log panel by default --- */
+    #hud-right {
+        display: none;
+    }
+
+    /* --- Full-width left panel --- */
+    #hud-left {
+        left: var(--hud-gap);
+        right: var(--hud-gap);
+        width: auto;
+        top: calc(var(--topbar-height) + 6px + var(--hud-gap));
+        bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
+    }
+
+    /* --- Full-width chart panel --- */
+    #hud-chart {
+        left: var(--hud-gap);
+        right: var(--hud-gap);
+        height: 160px;
+        bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
+    }
+
+    /* --- Hide panels by default; show via body classes toggled by JS --- */
+    #hud-left,
+    #hud-chart {
+        display: none;
+    }
+
+    body.show-left #hud-left,
+    body.show-left #hud-chart {
+        display: flex;
+    }
+
+    body.show-right #hud-right {
+        display: flex;
+        left: var(--hud-gap);
+        right: var(--hud-gap);
+        width: auto;
+    }
+
+    /* --- Mobile tab bar sits above the terminal --- */
+    #mobile-tabs {
+        display: flex;
+        position: fixed;
+        bottom: var(--terminal-height);
+        left: 0;
+        right: 0;
+        height: 40px;
+        z-index: var(--z-terminal);
+        background: var(--panel);
+        border-top: 1px solid var(--border);
+    }
+
+    .mtab {
+        flex: 1;
+        font-family: var(--stamp);
+        font-size: 16px;
+        letter-spacing: 3px;
+        background: transparent;
+        border: none;
+        border-right: 1px solid var(--border);
+        color: var(--mid);
+        cursor: pointer;
+        transition: all 0.1s;
+    }
+
+    .mtab:last-child {
+        border-right: none;
+    }
+
+    .mtab.act {
+        color: var(--or);
+        background: var(--dim);
+        border-bottom: 2px solid var(--or);
+    }
+
+    /* --- Topbar wraps at narrow widths --- */
+    #topbar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 8px 12px;
+        gap: 8px;
+    }
+
+    .logo {
+        font-size: 30px;
+    }
+
+    .clock {
+        font-size: 24px;
+    }
+
+    /* --- Narrow terminal --- */
+    #terminal {
+        height: 160px;
+    }
+
+    .aqi-big-wrap {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .vbars-row {
+        overflow-x: auto;
+        padding-bottom: 8px;
+        gap: 2px;
+    }
+
+    .vbw {
+        min-width: 54px;
+    }
+}
+
+/* ============================================================
+   SMALL MOBILE — max-width: 640px
+   ============================================================ */
+@media (max-width: 640px) {
+
+    /* Further reduce topbar padding */
+    #topbar {
+        padding: 6px 10px;
+    }
+
+    /* Hide the separator divider to save space */
+    .sep {
+        display: none;
+    }
+
+    .logo {
+        font-size: 26px;
+        letter-spacing: 4px;
+    }
+
+    .clock {
+        font-size: 20px;
+    }
+
+    .logo-sub {
+        font-size: 8px;
+    }
+}

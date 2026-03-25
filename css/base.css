@@ -1,0 +1,176 @@
+/* --- NERV GEO-MONITOR — BASE STYLES --- */
+/* Global resets, body layout, CRT overlay, hazard borders, and keyframes. */
+
+/* --- UNIVERSAL RESET --- */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* --- ROOT ELEMENT --- */
+html,
+body {
+    width: 100%;
+    height: 100%;
+    font-family: var(--mono);
+    background: var(--bg);
+    color: var(--st);
+    /* Full-screen HUD layout: everything is absolutely positioned over the map */
+    position: relative;
+    overflow: hidden;
+    /* Subtle screen flicker animation */
+    animation: flicker 12s infinite;
+}
+
+/* --- CRT SCANLINE OVERLAY --- */
+/* Creates a scanline effect layered on top of everything */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    /* Repeating horizontal lines to mimic CRT phosphor rows */
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+    );
+    /* Slow vertical scroll to simulate scanline movement */
+    animation: crt-scroll 10s linear infinite;
+    pointer-events: none;
+    /* Must sit on top of everything except critical overlays */
+    border-top: 2px solid #000;
+}
+
+@keyframes crt-scroll {
+    from { background-position: 0 0;   }
+    to   { background-position: 0 100%; }
+}
+
+/* --- HAZARD BORDERS --- */
+/* NERV-styled diagonal-stripe warning borders at top and bottom of viewport */
+.hazard-border-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    z-index: var(--z-terminal);
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--or)    0px,
+        var(--or)    10px,
+        #000         10px,
+        #000         20px
+    );
+    flex-shrink: 0;
+}
+
+.hazard-border-bot {
+    position: fixed;
+    bottom: var(--terminal-height);
+    left: 0;
+    right: 0;
+    height: 6px;
+    z-index: var(--z-terminal);
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--or)    0px,
+        var(--or)    10px,
+        #000         10px,
+        #000         20px
+    );
+    flex-shrink: 0;
+}
+
+/* --- FULL-SCREEN MAP CANVAS --- */
+/* The map is the lowest layer; all HUD panels float above it */
+#map-wrap {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-map);
+}
+
+/* --- GLOBAL LINK RESET --- */
+a {
+    color: var(--cy);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* --- SCROLLBAR OVERRIDES --- */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--mid);
+}
+
+/* --- BUTTON RESET --- */
+button {
+    cursor: pointer;
+    font-family: var(--mono);
+    border: none;
+    outline: none;
+    background: none;
+}
+
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   ============================================================ */
+
+/* --- BLINK — used for LED indicators and error states --- */
+@keyframes blink {
+    0%, 100% { opacity: 1;   }
+    50%       { opacity: 0.2; }
+}
+
+/* --- FLICKER — subtle whole-screen CRT flicker on body --- */
+@keyframes flicker {
+    0%, 100% { opacity: 1;    }
+    91%       { opacity: 0.82; }
+    92%       { opacity: 1;    }
+    95%       { opacity: 0.9;  }
+    96%       { opacity: 1;    }
+}
+
+/* --- RING-PULSE — expanding ring effect for map marker --- */
+@keyframes ring-pulse {
+    0% {
+        transform: scale(0.3);
+        opacity: 1;
+        border-width: 3px;
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+        border-width: 1px;
+    }
+}
+
+/* --- PULSE-A — panel border glow on high severity levels --- */
+@keyframes pulse-a {
+    0%, 100% { box-shadow: inset 0 0 0 rgba(255, 42, 42, 0);    }
+    50%       { box-shadow: inset 0 0 20px rgba(255, 48, 48, 0.3); }
+}
+
+/* --- CRT-SCROLL is defined above alongside body::after --- */

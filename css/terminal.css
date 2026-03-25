@@ -1,0 +1,131 @@
+/* --- NERV GEO-MONITOR — COMMAND TERMINAL --- */
+/* Interactive terminal docked at the bottom of the viewport. */
+
+/* ============================================================
+   TERMINAL CONTAINER
+   ============================================================ */
+#terminal {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--terminal-height);
+    z-index: var(--z-terminal);
+    display: flex;
+    flex-direction: column;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-top: 1px solid var(--border);
+    /* Shadow casting upward to separate from map */
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.7);
+}
+
+/* ============================================================
+   TERMINAL OUTPUT — scrollable log area
+   ============================================================ */
+.terminal-output {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 6px 0;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--gr);
+    scroll-behavior: smooth;
+}
+
+.terminal-output::-webkit-scrollbar {
+    width: 3px;
+}
+
+.terminal-output::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+/* ============================================================
+   TERMINAL LOG LINES — .terminal-line
+   ============================================================ */
+.terminal-line {
+    padding: 2px 16px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Alternating faint stripe for readability */
+.terminal-line:nth-child(even) {
+    background: rgba(255, 255, 255, 0.015);
+}
+
+/* --- Line type variants --- */
+.terminal-line--info {
+    color: var(--gr);
+}
+
+.terminal-line--warn {
+    color: var(--or);
+}
+
+.terminal-line--error {
+    color: var(--rd);
+    text-shadow: 0 0 4px rgba(255, 48, 48, 0.3);
+}
+
+.terminal-line--system {
+    color: var(--cy);
+    letter-spacing: 0.5px;
+}
+
+/* --- Timestamp prefix — small and dim --- */
+.terminal-line .timestamp {
+    font-size: 10px;
+    color: var(--mid);
+    margin-right: 6px;
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   INPUT ROW — prompt + text field
+   ============================================================ */
+.terminal-input-row {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+    padding: 0 12px;
+    height: 36px;
+    gap: 8px;
+}
+
+/* Non-editable prompt label */
+.terminal-prompt {
+    font-family: var(--stamp);
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--or);
+    flex-shrink: 0;
+    text-shadow: 0 0 6px rgba(255, 152, 48, 0.4);
+    user-select: none;
+}
+
+/* Text input field */
+.terminal-inp {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--st);
+    caret-color: var(--gr);
+    letter-spacing: 0.5px;
+}
+
+.terminal-inp::placeholder {
+    color: var(--mid);
+    opacity: 0.6;
+    font-style: italic;
+}
