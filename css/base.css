@@ -96,6 +96,12 @@ body::after {
     z-index: var(--z-map);
 }
 
+/* --- MAPLIBRE OVERRIDES --- */
+/* Force crosshair cursor on the map canvas */
+.maplibregl-canvas { cursor: crosshair !important; }
+/* Hide the default bottom-right MapLibre attribution/logo widget */
+.maplibregl-ctrl-bottom-right { display: none !important; }
+
 /* --- GLOBAL LINK RESET --- */
 a {
     color: var(--cy);
