@@ -8,7 +8,7 @@
 
 ## ✅ Progress Snapshot (as of 2026-03-26)
 
-Tasks **1–14 are complete**. Tasks 1–7 committed to `origin/alpha` (`fbefb53`); Tasks 8–14 implemented locally.
+Tasks **1–20 are complete**. Tasks 1–7 committed to `origin/alpha` (`fbefb53`); Tasks 8–20 implemented locally on `preview-1`.
 
 | # | Task | Status | Key Files |
 |---|------|--------|-----------|
@@ -26,9 +26,14 @@ Tasks **1–14 are complete**. Tasks 1–7 committed to `origin/alpha` (`fbefb53
 | 12 | JS Module: Map (Protomaps) | ✅ Done | `src/map/map.js` |
 | 13 | JS Module: Marker | ✅ Done | `src/map/marker.js` |
 | 14 | JS Module: Clock & Status Bar | ✅ Done | `src/ui/clock.js`, `src/ui/status-bar.js` |
-| 15–20 | Terminal, Panels, Chart, Main, Polish | ⬜ TODO | — |
+| 15 | JS Module: Terminal Core | ✅ Done | `src/ui/terminal.js` |
+| 16 | JS Module: Terminal Commands | ✅ Done | `src/ui/terminal-commands.js` |
+| 17 | JS Module: HUD Panels | ✅ Done | `src/ui/panels.js` |
+| 18 | JS Module: Chart | ✅ Done | `src/ui/chart.js` |
+| 19 | JS Module: Main Orchestrator | ✅ Done | `src/main.js` |
+| 20 | Polish & CRT Effects | ✅ Done | `css/base.css`, `src/**` |
 
-> **Next task to execute: Task 15.**
+> **All tasks executed. System ready for final verification.**
 
 ---
 
