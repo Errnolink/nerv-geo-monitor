@@ -26,6 +26,16 @@ body {
 }
 
 /* --- CRT SCANLINE OVERLAY --- */
+/* Vignette behind scanlines */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: calc(var(--z-overlay) - 1);
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.45) 100%);
+}
+
 /* Creates a scanline effect layered on top of everything */
 body::after {
     content: '';
