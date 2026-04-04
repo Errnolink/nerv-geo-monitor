@@ -6,25 +6,21 @@
    All floating HUD elements extend this class.
    clip-path cuts top-right and bottom-left corners (NERV signature).
    ============================================================ */
+/*
+  .nerv-panel — adapted from nerv-ui .panel:
+  Glassmorphic, sharp corners, orange top-border accent.
+  NERV-UI anti-pattern reminder: NO rounded corners, NO gray backgrounds.
+*/
 .nerv-panel {
-    position: absolute;
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
+    border-top: 2px solid var(--or);   /* Orange top accent — nerv-ui panel pattern */
     box-shadow: var(--glass-shadow);
-    /* Notched corners: top-right and bottom-left */
-    clip-path: polygon(
-        0 0,
-        calc(100% - var(--notch)) 0,
-        100% var(--notch),
-        100% 100%,
-        var(--notch) 100%,
-        0 calc(100% - var(--notch))
-    );
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 /* Inset depth border via ::after pseudo-element */
@@ -73,42 +69,40 @@
 /* ============================================================
    PANEL HEADER — .phdr
    ============================================================ */
+/* Panel header — adapted from nerv-ui .panel-header */
 .phdr {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 16px;
+    padding: 6px 14px;
     border-bottom: 1px solid var(--border);
-    background: rgba(255, 152, 48, 0.06);
+    background: rgba(255, 152, 48, 0.04);   /* Faint orange tint on header */
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--or);
+    letter-spacing: 2px;
+    text-transform: uppercase;
     flex-shrink: 0;
 }
 
-.phdr span {
-    font-family: var(--stamp);
-    font-size: 17px;
-    letter-spacing: 3px;
-    color: var(--or);
-    text-shadow: 0 0 8px rgba(255, 152, 48, 0.4);
-}
-
-/* --- RED-TINTED variant (for "current status" header) --- */
+/* Red-accent variant for CURRENT STATUS header */
 .phdr-rd {
-    background: rgba(255, 48, 48, 0.06);
-}
-
-.phdr-rd span {
+    border-top: 2px solid var(--rd);
     color: var(--rd);
-    text-shadow: 0 0 8px rgba(255, 48, 48, 0.35);
+    background: rgba(255, 48, 48, 0.04);
 }
 
 /* ============================================================
    SCROLLABLE PANEL BODY — .pscroll
    ============================================================ */
+/* Scrollable content region */
 .pscroll {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;   /* Critical: allows flex child to shrink below content size */
 }
 
 .pscroll::-webkit-scrollbar {
@@ -127,52 +121,54 @@
 /* ============================================================
    PANEL DATA CELLS — .psec, .plbl, .pval
    ============================================================ */
+/* Fix: label and value inline, no floating Z-pattern */
 .psec {
-    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 18px;
     border-bottom: 1px solid var(--border);
+    gap: 12px;
 }
 
 .plbl {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--or);
     letter-spacing: 2px;
-    font-weight: 700;
     text-transform: uppercase;
-    margin-bottom: 3px;
+    flex-shrink: 0;
 }
 
 .pval {
-    font-size: 14px;
+    font-size: 12px;
     color: var(--st);
-    letter-spacing: 0.5px;
-    font-weight: 700;
     text-align: right;
+    word-break: break-word;
+    font-family: var(--mono);
 }
 
 /* ============================================================
    CLEAR BUTTON — inside panel headers
    ============================================================ */
+/* CLEAR button — fix Bug #3: poor padding, touching border */
 .btn-clear {
-    font-family: var(--stamp);
-    font-size: 13px;
-    letter-spacing: 2px;
-    padding: 2px 10px;
-    border: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 9px;
     color: var(--mid);
+    letter-spacing: 2px;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
     background: transparent;
-    transition: all 0.12s;
-    clip-path: polygon(
-        var(--notch-sm) 0, 100% 0,
-        100% calc(100% - var(--notch-sm)),
-        calc(100% - var(--notch-sm)) 100%,
-        0 100%, 0 var(--notch-sm)
-    );
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    text-transform: uppercase;
+    margin-left: auto;
 }
 
 .btn-clear:hover {
-    border-color: var(--rd);
     color: var(--rd);
-    background: rgba(255, 48, 48, 0.08);
+    border-color: var(--rd);
+    background: rgba(255, 48, 48, 0.06);
 }
 
 /* ============================================================

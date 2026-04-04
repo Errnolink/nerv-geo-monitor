@@ -13,6 +13,11 @@
    ============================================================ */
 @media (max-width: 900px) {
 
+    /* Hide center card on mobile — no space for it */
+    .hud-center-card {
+        display: none !important;
+    }
+
     /* --- Hide right scan log panel by default --- */
     #hud-right {
         display: none;
@@ -27,22 +32,14 @@
         bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
     }
 
-    /* --- Full-width chart panel --- */
-    #hud-chart {
-        left: var(--hud-gap);
-        right: var(--hud-gap);
-        height: 160px;
-        bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
-    }
+    /* Full-width chart wave inner panel inside hud-left on mobile is automatic. */
 
     /* --- Hide panels by default; show via body classes toggled by JS --- */
-    #hud-left,
-    #hud-chart {
+    #hud-left {
         display: none;
     }
 
-    body.show-left #hud-left,
-    body.show-left #hud-chart {
+    body.show-left #hud-left {
         display: flex;
     }
 

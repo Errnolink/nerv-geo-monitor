@@ -11,6 +11,8 @@ import { createCommandHandler } from './ui/terminal-commands.js';
 import { renderData, clearLog, initMobileTabs } from './ui/panels.js';
 import { updateWaveTabs, drawWave } from './ui/chart.js';
 
+let _initScanComplete = false;
+
 function parseCoords(s) {
     const m = s.trim().match(/^(-?\d+\.?\d*)\s*[,\s]+\s*(-?\d+\.?\d*)$/);
     return m ? { lat: parseFloat(m[1]), lng: parseFloat(m[2]) } : null;
@@ -103,8 +105,6 @@ async function init() {
     });
 
     MapCtrl.onClick(async ({ lat, lng }) => {
-        const inp = $('terminal-inp');
-        if (inp) inp.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
         await doScan(lat, lng, `${lat.toFixed(3)}, ${lng.toFixed(3)}`);
     });
 
@@ -142,26 +142,26 @@ async function init() {
         }, { passive: false });
     }
 
-    setStatus('DETECTING LOCATION...', 'or');
-
-    try {
-        const gps = await getUserLocation();
-        const locName = `${gps.lat.toFixed(4)}, ${gps.lng.toFixed(4)} (GPS)`;
-        const inp = $('terminal-inp');
-        if (inp) inp.value = locName;
-        await doScan(gps.lat, gps.lng, locName);
-    } catch (e) {
-        termLog("GPS unavailable, falling back to IP...", 'info');
+    if (!_initScanComplete) {
+        setStatus('DETECTING LOCATION...', 'or');
         try {
-            const d = await getIPLocation();
-            const locName = d.city ? `${d.city}, ${d.region}` : 'Auto-Detected Location';
-            const inp = $('terminal-inp');
-            if (inp) inp.value = locName;
-            await doScan(d.lat, d.lng, locName);
-        } catch (err) {
-            const inp = $('terminal-inp');
-            if (inp) inp.value = 'Tokyo';
-            await startScan('Tokyo');
+            const gps = await getUserLocation();
+            _initScanComplete = true;
+            const locName = `${gps.lat.toFixed(4)}, ${gps.lng.toFixed(4)} (GPS)`;
+            await doScan(gps.lat, gps.lng, locName);
+        } catch (e) {
+            termLog('GPS unavailable, falling back to IP...', 'warn');
+            try {
+                const d = await getIPLocation();
+                _initScanComplete = true;
+                const locName = d.city ? `${d.city}, ${d.region}` : 'Auto-Detected Location';
+                await doScan(d.lat, d.lng, locName);
+            } catch (err) {
+                _initScanComplete = true;
+                const inp = $('terminal-inp');
+                if (inp) inp.value = 'Tokyo';
+                await startScan('Tokyo');
+            }
         }
     }
 }

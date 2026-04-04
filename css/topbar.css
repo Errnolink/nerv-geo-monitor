@@ -1,91 +1,130 @@
-/* --- NERV GEO-MONITOR — TOPBAR --- */
-/* Fixed glassmorphic header floating above the full-screen map. */
+/* --- NERV GEO-MONITOR — TOPBAR (Floating, Glassmorphic) --- */
+/* Adapted from nerv-ui .panel-header pattern + NERV-UI SKILL.md typography spec */
 
-/* ============================================================
-   TOPBAR CONTAINER
-   ============================================================ */
 #topbar {
     position: fixed;
-    top: 6px; /* sits below the 6px hazard-border-top stripe */
+    top: 6px;               /* Clears the 6px hazard-border-top */
     left: 0;
     right: 0;
     height: var(--topbar-height);
-    z-index: var(--z-hud);
+    z-index: var(--z-terminal);
     display: flex;
     align-items: center;
-    padding: 0 20px;
     gap: 16px;
+    padding: 0 18px;
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border-bottom: 1px solid var(--border);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 }
 
-/* ============================================================
-   LOGO BLOCK
-   ============================================================ */
+/* ─── Brand block (left) ─────────────────────────────── */
+.topbar-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex-shrink: 0;
+}
+
+/*
+  NERV-UI: "Noto Serif Display weight 900, mechanically compressed"
+  transform: scaleX(0.82) is the signature EVA look from SKILL.md
+*/
 .logo {
-    font-family: var(--stamp);
-    font-size: 38px;
-    letter-spacing: 6px;
+    font-family: var(--title);
+    font-weight: 900;
+    font-size: 26px;
+    letter-spacing: 0.25em;
     color: var(--or);
     text-shadow: 0 0 18px rgba(255, 152, 48, 0.55);
+    transform: var(--compress);      /* scaleX(0.82) from tokens.css */
+    transform-origin: left center;
     line-height: 1;
-    flex-shrink: 0;
+    text-transform: uppercase;
 }
 
 .logo-sub {
     font-family: var(--mono);
     font-size: 9px;
-    letter-spacing: 3px;
     color: var(--mid);
-    margin-top: -4px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 2px;
 }
 
-/* ============================================================
-   SEPARATOR
-   ============================================================ */
-.sep {
-    width: 1px;
-    height: 32px;
-    background: var(--border);
+.logo-ver {
+    color: var(--cy);
+}
+
+/* ─── Alert strip (left, next to brand) ─────────────── */
+.topbar-alert-strip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
     flex-shrink: 0;
 }
 
-/* ============================================================
-   RIGHT BLOCK — clock + status
-   ============================================================ */
+.alert-led {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gr);
+    box-shadow: 0 0 6px var(--gr);
+    flex-shrink: 0;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.alert-led.warn {
+    background: var(--or);
+    box-shadow: 0 0 6px var(--or);
+}
+
+.alert-led.crit {
+    background: var(--rd);
+    box-shadow: 0 0 6px var(--rd);
+    animation: blink 0.5s infinite;
+}
+
+.alert-text {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gr);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* ─── Flex spacer ─────────────────────────────────────── */
+.sep {
+    flex: 1;
+}
+
+/* ─── Right cluster (clock + system status) ──────────── */
 .topbar-r {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    margin-left: auto;
     gap: 2px;
     flex-shrink: 0;
 }
 
-/* --- CLOCK --- */
+/* NERV-UI: Saira Extra Condensed for stamps/banners */
 .clock {
     font-family: var(--stamp);
-    font-size: 32px;
+    font-size: 22px;
     letter-spacing: 3px;
     color: var(--cy);
-    text-shadow: 0 0 12px rgba(32, 240, 255, 0.4);
+    text-shadow: 0 0 10px rgba(32, 240, 255, 0.4);
     line-height: 1;
 }
 
-/* --- SYSTEM STATUS LINE --- */
 .top-sys {
+    font-family: var(--mono);
     font-size: 10px;
-    letter-spacing: 2px;
     color: var(--mid);
-    white-space: nowrap;
-}
-
-/* ============================================================
-   SEVERITY OVERRIDES — topbar adapts to hazard level
-   ============================================================ */
-body.lv5 #topbar {
-    border-bottom-color: var(--pu);
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }

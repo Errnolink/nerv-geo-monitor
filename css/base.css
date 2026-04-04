@@ -21,8 +21,6 @@ body {
     /* Full-screen HUD layout: everything is absolutely positioned over the map */
     position: relative;
     overflow: hidden;
-    /* Subtle screen flicker animation */
-    animation: flicker 12s infinite;
 }
 
 /* --- CRT SCANLINE OVERLAY --- */
@@ -36,25 +34,20 @@ body::before {
     background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.45) 100%);
 }
 
-/* Creates a scanline effect layered on top of everything */
-body::after {
-    content: '';
+/* --- NERV-UI CRT SCAN LINE OVERLAY (matches nerv-ui convention) --- */
+.scan-line-overlay {
     position: fixed;
     inset: 0;
-    z-index: var(--z-overlay);
-    /* Repeating horizontal lines to mimic CRT phosphor rows */
+    pointer-events: none;
+    z-index: calc(var(--z-overlay) - 1);
     background: repeating-linear-gradient(
         0deg,
         transparent,
         transparent 2px,
-        rgba(0, 0, 0, 0.08) 2px,
-        rgba(0, 0, 0, 0.08) 4px
+        rgba(0, 0, 0, 0.06) 2px,
+        rgba(0, 0, 0, 0.06) 4px
     );
-    /* Slow vertical scroll to simulate scanline movement */
     animation: crt-scroll 10s linear infinite;
-    pointer-events: none;
-    /* Must sit on top of everything except critical overlays */
-    border-top: 2px solid #000;
 }
 
 @keyframes crt-scroll {
@@ -102,8 +95,12 @@ body::after {
 /* The map is the lowest layer; all HUD panels float above it */
 #map-wrap {
     position: fixed;
-    inset: 0;
-    z-index: var(--z-map);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: auto;
 }
 
 /* --- MAPLIBRE OVERRIDES --- */

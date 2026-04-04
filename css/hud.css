@@ -2,21 +2,22 @@
 /* Defines fixed positions for floating HUD panels and all data display components. */
 
 /* ============================================================
-   HUD LEFT — AQI Data Panel
-   NOTE: .nerv-marker, .nerv-marker-ring, .nerv-marker-dot
-         CSS is also defined here (used by src/map/marker.js)
+   HUD LEFT — AQI Data Panel (flex column with wave-dock child)
    ============================================================ */
 #hud-left {
     position: fixed;
     top: calc(var(--topbar-height) + 6px + var(--hud-gap));
     left: var(--hud-gap);
-    width: 340px;
+    width: 320px;
     bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
     z-index: var(--z-hud);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 /* ============================================================
-   HUD RIGHT — Scan Log Panel
+   HUD RIGHT — Weather + Scan Log Panel
    ============================================================ */
 #hud-right {
     position: fixed;
@@ -25,18 +26,54 @@
     width: 300px;
     bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
     z-index: var(--z-hud);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 /* ============================================================
-   HUD CHART — Waveform Panel (bottom-center)
+   HUD CENTER — Floating location card over map
+   pointer-events: none so it never blocks map click-to-scan
    ============================================================ */
-#hud-chart {
+.hud-center-card {
     position: fixed;
-    bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
-    left: calc(340px + var(--hud-gap) * 2);
-    right: calc(300px + var(--hud-gap) * 2);
-    height: 180px;
+    top: calc(var(--topbar-height) + 6px + var(--hud-gap));
+    left: 50%;
+    transform: translateX(-50%);
     z-index: var(--z-hud);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--cy);
+    padding: 10px 18px;
+    pointer-events: none;
+    min-width: 200px;
+    text-align: center;
+}
+
+.hcc-label {
+    font-family: var(--stamp);
+    font-size: 16px;
+    letter-spacing: 3px;
+    color: var(--or);
+    text-transform: uppercase;
+}
+
+.hcc-coords {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--cy);
+    letter-spacing: 1px;
+    margin-top: 4px;
+}
+
+/* Thin vertical connector line pointing down toward the marker */
+.hcc-connector {
+    width: 1px;
+    height: 24px;
+    background: linear-gradient(to bottom, var(--cy), transparent);
+    margin: 6px auto 0;
 }
 
 /* ============================================================

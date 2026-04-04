@@ -4,7 +4,7 @@
  * Exports the `MapCtrl` singleton used throughout the app.
  */
 
-const PROTOMAPS_KEY = '1003762824b9687f';
+const PROTOMAPS_KEY = 'cc5fcedd6f093b17';
 const PROTOMAPS_URL = `https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=${PROTOMAPS_KEY}`;
 
 /** @type {import('maplibre-gl').Map|null} */

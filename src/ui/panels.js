@@ -75,9 +75,37 @@ export function buildBars(hourlyData, currentIndex) {
 
 export function addLog(name, aqi, lat, lng) {
     if (State.scanLog.length > 0 && State.scanLog[0].nm === name) return;
-    State.scanLog.unshift({ nm: name, aqi, lat, lng, t: new Date() });
-    if (State.scanLog.length > 14) State.scanLog.pop();
-    renderLog();
+    const now = new Date();
+    State.scanLog.unshift({ nm: name, aqi, lat, lng, t: now });
+    
+    const el = $('scan-log');
+    if (el) {
+        if (el.children.length === 1 && !el.children[0].classList.contains('log-e')) {
+            el.innerHTML = '';
+        }
+        document.querySelectorAll('.log-e.cur').forEach(c => c.classList.remove('cur'));
+        
+        const lv = Config.getLv(aqi), pad = n => String(n).padStart(2, '0');
+        const ts = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        const entry = document.createElement('div');
+        entry.className = 'log-e cur';
+        entry.innerHTML = `<div class="log-ts">${now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} ${ts}</div>
+      <div class="log-nm" style="color:${lv.col}">${name.split(',').slice(0, 2).join(',')}</div>
+      <div class="log-aq"><span class="log-aql">US AQI</span><span class="log-aqv" style="color:${lv.col}; text-shadow:0 0 5px ${lv.col}">${aqi} — ${lv.label}</span></div>`;
+        entry.onclick = () => {
+            const inp = $('terminal-inp');
+            if (inp) {
+                inp.value = name;
+            }
+            window.dispatchEvent(new CustomEvent('scan-request', { detail: { lat, lng, name } }));
+        };
+        el.prepend(entry);
+    }
+    
+    if (State.scanLog.length > 14) {
+        State.scanLog.pop();
+        if (el && el.lastChild) el.removeChild(el.lastChild);
+    }
 }
 
 export function renderLog() {
@@ -178,4 +206,16 @@ export function renderData(aqiData, weatherData, locName, lat, lng) {
     setStatus(`SCAN COMPLETE — US AQI ${usAqi} — ${lv.label}`, lv.lv >= 3 ? 'rd' : lv.lv >= 1 ? 'or' : 'gr');
     
     termLog(`SCAN OK — US AQI ${usAqi} [${lv.label}] — ${locName.split(',')[0]}`, 'system');
+    updateCenterCard(locName, lat, lng);
+}
+
+export function updateCenterCard(name, lat, lng) {
+    const card = document.getElementById('hud-center');
+    const locEl = document.getElementById('hcc-loc');
+    const coordsEl = document.getElementById('hcc-coords');
+    if (!card) return;
+    if (locEl) locEl.textContent = name.split(',')[0].toUpperCase().trim();
+    if (coordsEl) coordsEl.textContent =
+        `${parseFloat(lat).toFixed(4)}°N  ${parseFloat(lng).toFixed(4)}°E`;
+    card.style.display = 'block';
 }

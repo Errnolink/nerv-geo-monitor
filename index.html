@@ -5,120 +5,168 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>NERV // 大気質監視端末</title>
     <meta name="description" content="NERV Geo-Monitor — Real-time air quality and weather surveillance terminal">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000'/><text x='50' y='72' font-size='70' text-anchor='middle' fill='%23FF9830'>N</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Saira+Extra+Condensed:wght@400;600;700;800&family=Shippori+Mincho+B1:wght@500;700;800&display=swap" rel="stylesheet">    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
     <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- ═══ FULL-SCREEN MAP CANVAS ═══ -->
-    <div id="map-wrap"></div>
+  <!-- ═══ LAYER 0: Full-screen interactive map canvas ═══ -->
+  <div id="map-wrap"></div>
 
-    <!-- ═══ TOPBAR (floating, glassmorphic) ═══ -->
-    <div class="hazard-border-top"></div>
-    <header id="topbar">
-        <div>
-            <div class="logo">NERV</div>
-            <div class="logo-sub">GEO-MONITOR v10.0</div>
-        </div>
-        <div class="sep"></div>
-        <div class="topbar-r">
-            <div class="clock" id="clk">--:--:--</div>
-            <div class="top-sys">SYS: <b id="sys-stat" style="color:var(--gr)">STANDBY</b> // MAGI-01</div>
-        </div>
-    </header>
+  <!-- ═══ LAYER 1: Top Header Bar ═══ -->
+  <div class="hazard-border-top"></div>
+  <header id="topbar">
+    <div class="topbar-brand">
+      <div class="logo">NERV</div>
+      <div class="logo-sub">GEO-MONITOR <span class="logo-ver">v10.0</span></div>
+    </div>
+    <div class="topbar-alert-strip">
+      <span class="alert-led" id="alert-led"></span>
+      <span class="alert-text" id="alert-text">SYS NOMINAL</span>
+    </div>
+    <div class="sep"></div>
+    <div class="topbar-r">
+      <div class="clock" id="clk">--:--:--</div>
+      <div class="top-sys">SYS: <b id="sys-stat" style="color:var(--gr)">STANDBY</b> // MAGI-01</div>
+    </div>
+  </header>
 
-    <!-- ═══ HUD LEFT: AQI Data Panel ═══ -->
-    <section id="hud-left" class="nerv-panel">
-        <div class="phdr phdr-rd"><span>◆ CURRENT STATUS</span></div>
-        <div class="aqi-big-wrap">
-            <div class="aqi-num" id="c-aqi">—</div>
-            <div class="aqi-right">
-                <div class="aqi-status" id="c-stat">—</div>
-                <div class="aqi-cat" id="c-cat">US AQI</div>
-                <div class="aqi-stamp" id="c-stamp">STANDBY</div>
-            </div>
-        </div>
-        <div class="sev-wrap">
-            <div class="plbl">SEVERITY</div>
-            <div class="sev-row" id="sev-row">
-                <div class="sev-blk"></div><div class="sev-blk"></div><div class="sev-blk"></div><div class="sev-blk"></div><div class="sev-blk"></div>
-            </div>
-        </div>
-        <div class="pscroll">
-            <!-- WEATHER ROW (new) -->
-            <div class="weather-row" id="weather-row">
-                <div class="weather-item"><div class="weather-val" id="w-temp">—</div><div class="weather-lbl">TEMP °C</div></div>
-                <div class="weather-item"><div class="weather-val" id="w-humid">—</div><div class="weather-lbl">HUMIDITY %</div></div>
-                <div class="weather-item"><div class="weather-val" id="w-code">—</div><div class="weather-lbl">CONDITION</div></div>
-            </div>
-            <!-- Existing data sections -->
-            <div class="psec"><div class="plbl">LOCATION</div><div class="pval" id="c-loc">—</div></div>
-            <div class="psec"><div class="plbl">COORDINATES</div><div class="pval" id="c-coords">—</div></div>
-            <div class="psec"><div class="plbl">DATA TIME</div><div class="pval" id="c-ts">—</div></div>
-            <div class="psec"><div class="plbl">DOMINANT</div><div class="pval" id="c-dom">—</div></div>
-            <div class="psec"><div class="plbl">EU AQI</div><div class="pval" id="c-eaqi">—</div></div>
-            <div class="psec" style="border-bottom:none"><div class="plbl">UV INDEX</div><div class="pval" id="c-uv">—</div></div>
-            <div class="phdr" style="margin-top:4px"><span>◆ POLLUTANTS</span></div>
-            <div class="vbars-wrap"><div class="vbars-row" id="vbars-row"></div></div>
-            <div class="pol-detail" id="pol-detail">
-                <div class="pd-row">
-                    <div><div class="pd-lbl" id="pd-name">—</div></div>
-                    <div><div class="pd-lbl">WHO GUIDELINE</div><div class="pd-val" id="pd-who">—</div></div>
-                    <div><div class="pd-lbl">SOURCES</div><div class="pd-val" id="pd-src">—</div></div>
-                    <div><div class="pd-lbl">HEALTH EFFECTS</div><div class="pd-val" id="pd-fx">—</div></div>
-                </div>
-            </div>
-        </div>
-    </section>
+  <!-- ═══ LAYER 2: Left Floating Panel (AQI Data + Waveform Dock) ═══ -->
+  <section id="hud-left" class="nerv-panel">
 
-    <!-- ═══ HUD RIGHT: Scan Log ═══ -->
-    <section id="hud-right" class="nerv-panel">
-        <div class="phdr">
-            <span>◆ SCAN LOG</span>
-            <button class="btn-clear" id="clear-btn">CLEAR</button>
-        </div>
-        <div class="pscroll" id="scan-log">
-            <div style="padding:20px;font-size:13px;color:var(--mid);letter-spacing:1px;font-weight:700;">AWAITING FIRST SCAN...</div>
-        </div>
-    </section>
+    <!-- Fixed: Panel header -->
+    <div class="phdr phdr-rd"><span>◆ CURRENT STATUS</span></div>
 
-    <!-- ═══ HUD CHART: Waveform ═══ -->
-    <section id="hud-chart" class="nerv-panel">
-        <div class="phdr" style="flex-shrink:0;"><span>◆ AQI WAVEFORM — 48H · PAST ─── FORECAST ╌╌╌</span></div>
-        <div id="wave-tabs">
-            <button class="wtab on" data-wk="us_aqi">US AQI</button>
-            <button class="wtab" data-wk="pm2_5">PM2.5</button>
-            <button class="wtab" data-wk="pm10">PM10</button>
-            <button class="wtab" data-wk="ozone">O₃</button>
-            <button class="wtab" data-wk="nitrogen_dioxide">NO₂</button>
-            <button class="wtab" data-wk="sulphur_dioxide">SO₂</button>
-            <button class="wtab" data-wk="carbon_monoxide">CO</button>
-        </div>
-        <div id="wave-inner"><svg id="wave-svg"></svg></div>
-    </section>
-
-    <!-- ═══ MOBILE TABS ═══ -->
-    <div id="mobile-tabs">
-        <button class="mtab act" data-mt="left">DATA</button>
-        <button class="mtab" data-mt="right">LOG</button>
+    <!-- Fixed: AQI big number row -->
+    <div class="aqi-big-wrap">
+      <div class="aqi-num" id="c-aqi">—</div>
+      <div class="aqi-right">
+        <div class="aqi-status" id="c-stat">—</div>
+        <div class="aqi-cat" id="c-cat">US AQI</div>
+        <div class="aqi-stamp" id="c-stamp">STANDBY</div>
+      </div>
     </div>
 
-    <!-- ═══ COMMAND TERMINAL ═══ -->
-    <div class="hazard-border-bot"></div>
-    <div id="terminal">
-        <div class="terminal-output" id="terminal-output"></div>
-        <div class="terminal-input-row">
-            <span class="terminal-prompt">NERV://&gt;</span>
-            <input class="terminal-inp" id="terminal-inp" placeholder="Enter location / command..." autocomplete="off" spellcheck="false">
-        </div>
+    <!-- Fixed: Severity bar -->
+    <div class="sev-wrap">
+      <div class="plbl">SEVERITY</div>
+      <div class="sev-row" id="sev-row">
+        <div class="sev-blk"></div><div class="sev-blk"></div>
+        <div class="sev-blk"></div><div class="sev-blk"></div>
+        <div class="sev-blk"></div>
+      </div>
     </div>
 
-    <!-- ═══ ERROR OVERLAY ═══ -->
-    <div id="err-box"></div>
+    <!-- Scrollable: Location data + pollutant bars -->
+    <div class="pscroll">
+      <div class="psec"><div class="plbl">LOCATION</div><div class="pval" id="c-loc">—</div></div>
+      <div class="psec"><div class="plbl">COORDINATES</div><div class="pval" id="c-coords">—</div></div>
+      <div class="psec"><div class="plbl">DATA TIME</div><div class="pval" id="c-ts">—</div></div>
+      <div class="psec"><div class="plbl">DOMINANT</div><div class="pval" id="c-dom">—</div></div>
+      <div class="psec"><div class="plbl">EU AQI</div><div class="pval" id="c-eaqi">—</div></div>
+      <div class="psec" style="border-bottom:none"><div class="plbl">UV INDEX</div><div class="pval" id="c-uv">—</div></div>
+      <div class="phdr" style="margin-top:4px"><span>◆ POLLUTANTS</span></div>
+      <div class="vbars-wrap"><div class="vbars-row" id="vbars-row"></div></div>
+      <div class="pol-detail" id="pol-detail">
+        <div class="pd-row">
+          <div><div class="pd-lbl" id="pd-name">—</div></div>
+          <div><div class="pd-lbl">WHO GUIDELINE</div><div class="pd-val" id="pd-who">—</div></div>
+          <div><div class="pd-lbl">SOURCES</div><div class="pd-val" id="pd-src">—</div></div>
+          <div><div class="pd-lbl">HEALTH EFFECTS</div><div class="pd-val" id="pd-fx">—</div></div>
+        </div>
+      </div>
+    </div>
 
-    <!-- ═══ APP ENTRY POINT ═══ -->
-    <script type="module" src="src/main.js"></script>
+    <!--
+      WAVEFORM DOCK: Fixed-height, non-scrolling.
+      This div is a SIBLING of .pscroll (not a child).
+      It is the last flex child of #hud-left, anchored to its bottom.
+      id="hud-chart" is kept so src/ui/chart.js requires no changes.
+    -->
+    <div id="hud-chart" class="wave-dock">
+      <div class="phdr" style="flex-shrink:0"><span>◆ AQI WAVEFORM — 48H · PAST ─── FORECAST ╌╌╌</span></div>
+      <div id="wave-tabs">
+        <button class="wtab on" data-wk="us_aqi">US AQI</button>
+        <button class="wtab" data-wk="pm2_5">PM2.5</button>
+        <button class="wtab" data-wk="pm10">PM10</button>
+        <button class="wtab" data-wk="ozone">O₃</button>
+        <button class="wtab" data-wk="nitrogen_dioxide">NO₂</button>
+        <button class="wtab" data-wk="sulphur_dioxide">SO₂</button>
+        <button class="wtab" data-wk="carbon_monoxide">CO</button>
+      </div>
+      <div id="wave-inner"><svg id="wave-svg"></svg></div>
+    </div>
+
+  </section>
+
+  <!-- ═══ LAYER 2: Right Floating Panel (Weather + Scan Log) ═══ -->
+  <section id="hud-right" class="nerv-panel">
+    <div class="phdr"><span>◆ WEATHER DATA</span></div>
+    <div class="weather-row" id="weather-row">
+      <div class="weather-item">
+        <div class="weather-val" id="w-temp">—</div>
+        <div class="weather-lbl">TEMP °C</div>
+      </div>
+      <div class="weather-item">
+        <div class="weather-val" id="w-humid">—</div>
+        <div class="weather-lbl">HUMIDITY %</div>
+      </div>
+      <div class="weather-item">
+        <div class="weather-val" id="w-code">—</div>
+        <div class="weather-lbl">CONDITION</div>
+      </div>
+    </div>
+    <div class="phdr">
+      <span>◆ SCAN LOG</span>
+      <button class="btn-clear" id="clear-btn">CLEAR</button>
+    </div>
+    <div class="pscroll" id="scan-log">
+      <div style="padding:20px;font-size:13px;color:var(--mid);letter-spacing:1px;font-weight:700;">AWAITING FIRST SCAN...</div>
+    </div>
+  </section>
+
+  <!-- ═══ LAYER 2: Center Floating Location Card ═══ -->
+  <!--
+    Visibility controlled by JS (updateCenterCard in panels.js).
+    Starts hidden. Appears over map center after first scan.
+    pointer-events: none — so it never blocks map click-to-scan.
+  -->
+  <div id="hud-center" class="hud-center-card" style="display:none;">
+    <div class="hcc-label" id="hcc-loc">—</div>
+    <div class="hcc-coords" id="hcc-coords">—</div>
+    <div class="hcc-connector"></div>
+  </div>
+
+  <!-- ═══ Mobile tab navigation (hidden above 900px) ═══ -->
+  <div id="mobile-tabs">
+    <button class="mtab act" data-mt="left">DATA</button>
+    <button class="mtab" data-mt="right">LOG</button>
+  </div>
+
+  <!-- ═══ LAYER 3: Bottom Terminal Dock ═══ -->
+  <div class="hazard-border-bot"></div>
+  <div id="terminal">
+    <div class="terminal-header">
+      <span class="terminal-title">NERV://TERMINAL</span>
+      <span class="terminal-status" id="term-status">● ONLINE</span>
+    </div>
+    <div class="terminal-output" id="terminal-output"></div>
+    <div class="terminal-input-row">
+      <span class="terminal-prompt">NERV://&gt;</span>
+      <input class="terminal-inp" id="terminal-inp"
+             placeholder="Enter location or command (type HELP)..."
+             autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <!-- ═══ Error overlay ═══ -->
+  <div id="err-box"></div>
+
+
+  <!-- ═══ App entry point ═══ -->
+  <script type="module" src="src/main.js"></script>
+
 </body>
 </html>

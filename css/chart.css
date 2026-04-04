@@ -2,22 +2,45 @@
 /* Styles for the AQI waveform SVG chart inside #hud-chart. */
 
 /* ============================================================
-   WAVE TABS — pollutant selector row
+   WAVE DOCK — fixed-height waveform section inside #hud-left
+   Sits as a flex child BELOW .pscroll. Does NOT scroll.
+   flex-shrink: 0 means it always keeps its height.
    ============================================================ */
+.wave-dock {
+    flex-shrink: 0;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+}
+
 #wave-tabs {
     display: flex;
-    gap: 4px;
-    padding: 6px 14px;
-    background: rgba(0, 0, 0, 0.25);
+    gap: 0;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
     overflow-x: auto;
     scrollbar-width: none;
 }
 
-#wave-tabs::-webkit-scrollbar {
-    display: none;
+#wave-tabs::-webkit-scrollbar { display: none; }
+
+#wave-inner {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    min-height: 0;
 }
+
+/* ============================================================
+   WAVE TABS — pollutant selector row
+   ============================================================ */
+/* ============================================================
+   WAVE TABS — pollutant selector row (existing styles overriden above mostly)
+   ============================================================ */
 
 /* --- Individual tab button --- */
 .wtab {
@@ -57,11 +80,6 @@
 /* ============================================================
    WAVE SVG CANVAS AREA
    ============================================================ */
-#wave-inner {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-}
 
 #wave-svg {
     width: 100%;
