@@ -1,5 +1,4 @@
 import { termLog } from './terminal.js';
-import { fetchSuggestions } from '../api/geocode.js';
 
 export function createCommandHandler(actions) {
     return async function handleCommand(raw) {

@@ -8,7 +8,7 @@ import { initClock } from './ui/clock.js';
 import { setStatus, showErr } from './ui/status-bar.js';
 import { initTerminal, termLog, bootSequence } from './ui/terminal.js';
 import { createCommandHandler } from './ui/terminal-commands.js';
-import { renderData, clearLog, initMobileTabs, addLog } from './ui/panels.js';
+import { renderData, clearLog, initMobileTabs } from './ui/panels.js';
 import { updateWaveTabs, drawWave } from './ui/chart.js';
 
 function parseCoords(s) {
@@ -102,7 +102,7 @@ async function init() {
         });
     });
 
-    MapCtrl.onClick(async (lng, lat) => {
+    MapCtrl.onClick(async ({ lat, lng }) => {
         const inp = $('terminal-inp');
         if (inp) inp.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
         await doScan(lat, lng, `${lat.toFixed(3)}, ${lng.toFixed(3)}`);
