@@ -23,11 +23,9 @@
     --dim:    #111116;      /* Slightly elevated dark surface */
     --st:     #D8D8D0;      /* Standard body text */
 
-    /* --- TYPOGRAPHY (aligned with NERV-UI v2 spec) --- */
-    --mono:   'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
-    --stamp:  'Saira Extra Condensed', 'Bebas Neue', 'Arial Narrow', sans-serif;
-    --title:  'Noto Serif Display', 'Times New Roman', serif;
-    --mincho: 'Shippori Mincho B1', 'YuMincho', serif;
+    /* --- TYPOGRAPHY --- */
+    --mono:   'IBM Plex Mono', 'Courier New', monospace;
+    --stamp:  'Bebas Neue', 'Arial Narrow', sans-serif;
     --compress: scaleX(0.82);  /* Mechanical compression — NERV-UI signature */
     --ac:    var(--or);     /* Accent alias */
 

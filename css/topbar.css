@@ -27,15 +27,11 @@
     flex-shrink: 0;
 }
 
-/*
-  NERV-UI: "Noto Serif Display weight 900, mechanically compressed"
-  transform: scaleX(0.82) is the signature EVA look from SKILL.md
-*/
-.logo {
-    font-family: var(--title);
-    font-weight: 900;
-    font-size: 26px;
-    letter-spacing: 0.25em;
+:.logo {
+    font-family: var(--stamp);
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: 0.15em;
     color: var(--or);
     text-shadow: 0 0 18px rgba(255, 152, 48, 0.55);
     transform: var(--compress);      /* scaleX(0.82) from tokens.css */

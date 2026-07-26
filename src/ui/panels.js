@@ -218,7 +218,8 @@ export function renderData(aqiData, weatherData, locName, lat, lng) {
     updateCenterCard(locName, lat, lng);
 }
 
-export function updateCenterCard(name, lat, lng) {
+export async function updateCenterCard(name, lat, lng) {
+    // Drive the floating #hud-center card
     const card = document.getElementById('hud-center');
     const locEl = document.getElementById('hcc-loc');
     const coordsEl = document.getElementById('hcc-coords');
@@ -227,6 +228,9 @@ export function updateCenterCard(name, lat, lng) {
     if (coordsEl) coordsEl.textContent =
         `${parseFloat(lat).toFixed(4)}°N  ${parseFloat(lng).toFixed(4)}°E`;
     card.style.display = 'block';
+    // Also update the MapLibre popup on the marker
+    const { updatePopup } = await import('../map/marker.js');
+    updatePopup(name, lat, lng);
 }
 
 export function initTerminalTabs() {
