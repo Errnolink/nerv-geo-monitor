@@ -23,7 +23,7 @@
     position: fixed;
     top: calc(var(--topbar-height) + 6px + var(--hud-gap));
     right: var(--hud-gap);
-    width: 300px;
+    width: 280px;
     bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
     z-index: var(--z-hud);
     display: flex;
@@ -74,6 +74,62 @@
     height: 24px;
     background: linear-gradient(to bottom, var(--cy), transparent);
     margin: 6px auto 0;
+}
+
+/* ============================================================
+   NERV MAP POPUP — MapLibre popup styled as NERV HUD element
+   Fades out on map move, fades back in on idle.
+   ============================================================ */
+.nerv-popup {
+    transition: opacity 0.25s ease;
+}
+
+.nerv-popup .maplibregl-popup-content {
+    background: rgba(10, 10, 12, 0.92);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--cy);
+    border-radius: 0;
+    padding: 10px 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
+    min-width: 160px;
+}
+
+.nerv-popup .maplibregl-popup-close-button {
+    color: var(--mid);
+    font-size: 18px;
+    right: 4px;
+    top: 2px;
+    padding: 0;
+    line-height: 1;
+}
+
+.nerv-popup .maplibregl-popup-close-button:hover {
+    color: var(--rd);
+    background: none;
+}
+
+.nerv-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    border-top-color: rgba(10, 10, 12, 0.92);
+}
+
+.nerv-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    border-bottom-color: rgba(10, 10, 12, 0.92);
+}
+
+.nerv-popup-name {
+    font-family: var(--stamp);
+    font-size: 16px;
+    letter-spacing: 3px;
+    color: var(--or);
+    text-transform: uppercase;
+}
+
+.nerv-popup-coords {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--cy);
+    letter-spacing: 1px;
+    margin-top: 4px;
 }
 
 /* ============================================================
@@ -148,38 +204,42 @@
 }
 
 /* ============================================================
-   WEATHER ROW (new)
+   WEATHER GRID — 3×2 metrics layout
    ============================================================ */
-.weather-row {
-    display: flex;
-    gap: 0;
+.weather-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
 }
 
 .weather-item {
-    flex: 1;
     text-align: center;
-    padding: 10px 6px;
+    padding: 8px 4px;
     border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
 }
 
-.weather-item:last-child {
+.weather-item:nth-child(3n) {
     border-right: none;
+}
+
+.weather-item:nth-last-child(-n+3) {
+    border-bottom: none;
 }
 
 .weather-val {
     font-family: var(--stamp);
-    font-size: 20px;
+    font-size: 18px;
     letter-spacing: 1px;
     color: var(--cy);
     text-shadow: 0 0 6px rgba(32, 240, 255, 0.25);
 }
 
 .weather-lbl {
-    font-size: 9px;
+    font-size: 8px;
     color: var(--mid);
-    letter-spacing: 1.5px;
+    letter-spacing: 1px;
     margin-top: 2px;
 }
 

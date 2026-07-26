@@ -86,3 +86,55 @@
     height: 100%;
     display: block;
 }
+
+/* ============================================================
+   WEATHER WAVE TABS + CONTAINER
+   Mirrors the AQI wave dock pattern for the right panel.
+   ============================================================ */
+#weather-wave-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+#weather-wave-tabs::-webkit-scrollbar { display: none; }
+
+.wwtab {
+    font-family: var(--stamp);
+    font-size: 14px;
+    letter-spacing: 2px;
+    padding: 3px 10px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--mid);
+    transition: all 0.12s;
+    flex-shrink: 0;
+}
+
+.wwtab:hover {
+    border-color: var(--cy);
+    color: var(--cy);
+    background: rgba(32, 240, 255, 0.05);
+}
+
+.wwtab.on {
+    text-shadow: 0 0 6px currentColor;
+}
+
+#weather-wave-inner {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    min-height: 0;
+}
+
+#weather-wave-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}

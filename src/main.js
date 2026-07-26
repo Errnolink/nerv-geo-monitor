@@ -8,10 +8,19 @@ import { initClock } from './ui/clock.js';
 import { setStatus, showErr } from './ui/status-bar.js';
 import { initTerminal, termLog, bootSequence } from './ui/terminal.js';
 import { createCommandHandler } from './ui/terminal-commands.js';
-import { renderData, clearLog, initMobileTabs } from './ui/panels.js';
-import { updateWaveTabs, drawWave } from './ui/chart.js';
+import { renderData, clearLog, initMobileTabs, initTerminalTabs } from './ui/panels.js';
+import { updateWaveTabs, drawWave, updateWeatherWaveTabs, drawWeatherWave } from './ui/chart.js';
 
 let _initScanComplete = false;
+
+function _weatherCurrentIdx(times) {
+    const n = new Date();
+    const pad = x => String(x).padStart(2, '0');
+    const t = `${n.getFullYear()}-${pad(n.getMonth() + 1)}-${pad(n.getDate())}T${pad(n.getHours())}:00`;
+    let b = 0;
+    times.forEach((v, i) => { if (v <= t) b = i; });
+    return b;
+}
 
 function parseCoords(s) {
     const m = s.trim().match(/^(-?\d+\.?\d*)\s*[,\s]+\s*(-?\d+\.?\d*)$/);
@@ -84,6 +93,7 @@ async function init() {
     initClock();
     MapCtrl.init();
     initMobileTabs();
+    initTerminalTabs();
 
     const handleCommand = createCommandHandler({ doScan, startScan, clearLog });
     initTerminal(handleCommand);
@@ -101,6 +111,18 @@ async function init() {
             State.waveKey = btn.dataset.wk;
             updateWaveTabs();
             drawWave(State.data.hourly.time, State.data.hourly[State.waveKey], State.ci, State.waveKey);
+        });
+    });
+
+    // Weather waveform tab listeners
+    document.querySelectorAll('.wwtab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!State.weather?.hourly) return;
+            State.weatherWaveKey = btn.dataset.wwk;
+            updateWeatherWaveTabs();
+            const wh = State.weather.hourly;
+            const wci = _weatherCurrentIdx(wh.time);
+            drawWeatherWave(wh.time, wh[State.weatherWaveKey], wci, State.weatherWaveKey);
         });
     });
 
@@ -148,6 +170,8 @@ async function init() {
             const gps = await getUserLocation();
             _initScanComplete = true;
             const locName = `${gps.lat.toFixed(4)}, ${gps.lng.toFixed(4)} (GPS)`;
+            const inp = $('terminal-inp');
+            if (inp) inp.value = locName;
             await doScan(gps.lat, gps.lng, locName);
         } catch (e) {
             termLog('GPS unavailable, falling back to IP...', 'warn');
@@ -155,6 +179,8 @@ async function init() {
                 const d = await getIPLocation();
                 _initScanComplete = true;
                 const locName = d.city ? `${d.city}, ${d.region}` : 'Auto-Detected Location';
+                const inp = $('terminal-inp');
+                if (inp) inp.value = locName;
                 await doScan(d.lat, d.lng, locName);
             } catch (err) {
                 _initScanComplete = true;

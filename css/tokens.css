@@ -43,7 +43,7 @@
     --hud-gap:  12px;       /* Gap between floating HUD panels */
 
     /* --- DIMENSIONS (new) --- */
-    --terminal-height: 120px;
+    --terminal-height: 150px;
     --topbar-height:   54px;
 
     /* --- Z-INDEX LAYERS (new) --- */

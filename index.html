@@ -8,7 +8,6 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000'/><text x='50' y='72' font-size='70' text-anchor='middle' fill='%23FF9830'>N</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Saira+Extra+Condensed:wght@400;600;700;800&family=Shippori+Mincho+B1:wght@500;700;800&display=swap" rel="stylesheet">    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
     <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -20,7 +19,7 @@
   <header id="topbar">
     <div class="topbar-brand">
       <div class="logo">NERV</div>
-      <div class="logo-sub">GEO-MONITOR <span class="logo-ver">v10.0</span></div>
+      <div class="logo-sub">GEO-MONITOR</div>
     </div>
     <div class="topbar-alert-strip">
       <span class="alert-led" id="alert-led"></span>
@@ -62,7 +61,6 @@
     <!-- Scrollable: Location data + pollutant bars -->
     <div class="pscroll">
       <div class="psec"><div class="plbl">LOCATION</div><div class="pval" id="c-loc">—</div></div>
-      <div class="psec"><div class="plbl">COORDINATES</div><div class="pval" id="c-coords">—</div></div>
       <div class="psec"><div class="plbl">DATA TIME</div><div class="pval" id="c-ts">—</div></div>
       <div class="psec"><div class="plbl">DOMINANT</div><div class="pval" id="c-dom">—</div></div>
       <div class="psec"><div class="plbl">EU AQI</div><div class="pval" id="c-eaqi">—</div></div>
@@ -101,10 +99,10 @@
 
   </section>
 
-  <!-- ═══ LAYER 2: Right Floating Panel (Weather + Scan Log) ═══ -->
+  <!-- ═══ LAYER 2: Right Floating Panel (Weather Data + Waveform) ═══ -->
   <section id="hud-right" class="nerv-panel">
     <div class="phdr"><span>◆ WEATHER DATA</span></div>
-    <div class="weather-row" id="weather-row">
+    <div class="weather-grid" id="weather-row">
       <div class="weather-item">
         <div class="weather-val" id="w-temp">—</div>
         <div class="weather-lbl">TEMP °C</div>
@@ -117,15 +115,35 @@
         <div class="weather-val" id="w-code">—</div>
         <div class="weather-lbl">CONDITION</div>
       </div>
+      <div class="weather-item">
+        <div class="weather-val" id="w-wind">—</div>
+        <div class="weather-lbl">WIND km/h</div>
+      </div>
+      <div class="weather-item">
+        <div class="weather-val" id="w-press">—</div>
+        <div class="weather-lbl">PRESSURE hPa</div>
+      </div>
+      <div class="weather-item">
+        <div class="weather-val" id="w-cloud">—</div>
+        <div class="weather-lbl">CLOUD %</div>
+      </div>
     </div>
-    <div class="phdr">
-      <span>◆ SCAN LOG</span>
-      <button class="btn-clear" id="clear-btn">CLEAR</button>
-    </div>
-    <div class="pscroll" id="scan-log">
-      <div style="padding:20px;font-size:13px;color:var(--mid);letter-spacing:1px;font-weight:700;">AWAITING FIRST SCAN...</div>
+
+    <!-- Weather Waveform Dock -->
+    <div id="weather-chart" class="wave-dock">
+      <div class="phdr" style="flex-shrink:0"><span>◆ WEATHER — 48H · PAST ─── FORECAST ╌╌╌</span></div>
+      <div id="weather-wave-tabs">
+        <button class="wwtab on" data-wwk="temperature_2m">TEMP</button>
+        <button class="wwtab" data-wwk="wind_speed_10m">WIND</button>
+        <button class="wwtab" data-wwk="relative_humidity_2m">HUMID</button>
+        <button class="wwtab" data-wwk="surface_pressure">PRESS</button>
+        <button class="wwtab" data-wwk="cloud_cover">CLOUD</button>
+      </div>
+      <div id="weather-wave-inner"><svg id="weather-wave-svg"></svg></div>
     </div>
   </section>
+
+
 
   <!-- ═══ LAYER 2: Center Floating Location Card ═══ -->
   <!--
@@ -149,21 +167,35 @@
   <div class="hazard-border-bot"></div>
   <div id="terminal">
     <div class="terminal-header">
-      <span class="terminal-title">NERV://TERMINAL</span>
-      <span class="terminal-status" id="term-status">● ONLINE</span>
+      <div class="terminal-tabs">
+        <button class="term-tab active" data-tab="output">◆ TERMINAL</button>
+        <button class="term-tab" data-tab="scanlog">◆ SCAN LOG</button>
+      </div>
+      <div class="terminal-header-r">
+        <button class="btn-clear" id="clear-btn" style="display:none;">CLEAR</button>
+        <span class="terminal-status" id="term-status">● ONLINE</span>
+      </div>
     </div>
-    <div class="terminal-output" id="terminal-output"></div>
+    <div class="terminal-body">
+      <div class="terminal-output" id="terminal-output"></div>
+      <div class="terminal-scanlog" id="scan-log" style="display:none;">
+        <div style="padding:20px;font-size:13px;color:var(--mid);letter-spacing:1px;font-weight:700;">AWAITING FIRST SCAN...</div>
+      </div>
+    </div>
     <div class="terminal-input-row">
       <span class="terminal-prompt">NERV://&gt;</span>
       <input class="terminal-inp" id="terminal-inp"
-             placeholder="Enter location or command (type HELP)..."
+             placeholder="Press / to focus • Tab to autocomplete"
              autocomplete="off" spellcheck="false">
+      <div class="term-autocomplete" id="term-autocomplete"></div>
     </div>
   </div>
 
   <!-- ═══ Error overlay ═══ -->
   <div id="err-box"></div>
 
+  <!-- ═══ NERV-UI CRT scan line overlay ═══ -->
+  <div class="scan-line-overlay" aria-hidden="true"></div>
 
   <!-- ═══ App entry point ═══ -->
   <script type="module" src="src/main.js"></script>

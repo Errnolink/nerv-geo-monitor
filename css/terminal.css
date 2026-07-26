@@ -25,19 +25,46 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 14px;
-    height: 22px;
     border-bottom: 1px solid var(--border);
     background: rgba(255, 152, 48, 0.04);
     flex-shrink: 0;
+    height: 24px;
 }
 
-.terminal-title {
+.terminal-tabs {
+    display: flex;
+    height: 100%;
+}
+
+.term-tab {
     font-family: var(--mono);
     font-size: 9px;
-    color: var(--or);
-    letter-spacing: 3px;
+    color: var(--mid);
+    letter-spacing: 2px;
     text-transform: uppercase;
+    padding: 0 14px;
+    height: 100%;
+    border: none;
+    border-right: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+}
+
+.term-tab:hover {
+    color: var(--or);
+}
+
+.term-tab.active {
+    color: var(--or);
+    background: rgba(255, 152, 48, 0.08);
+}
+
+.terminal-header-r {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-right: 14px;
 }
 
 .terminal-status {
@@ -45,6 +72,22 @@
     font-size: 9px;
     color: var(--gr);
     letter-spacing: 2px;
+}
+
+/* Terminal body — holds output and scan log, only one visible at a time */
+.terminal-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.terminal-scanlog {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
 }
 
 /* ============================================================

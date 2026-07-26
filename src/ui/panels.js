@@ -1,8 +1,8 @@
 import { $, State } from '../state.js';
 import { Config, WEATHER_CODES } from '../config.js';
-import { updateMarker } from '../map/marker.js';
+import { updateMarker, updatePopup } from '../map/marker.js';
 import { setStatus } from './status-bar.js';
-import { updateWaveTabs, drawWave } from './chart.js';
+import { updateWaveTabs, drawWave, updateWeatherWaveTabs, drawWeatherWave } from './chart.js';
 import { termLog } from './terminal.js';
 
 function currentIdx(times) {
@@ -203,6 +203,15 @@ export function renderData(aqiData, weatherData, locName, lat, lng) {
     drawWave(times, h[State.waveKey], ci, State.waveKey);
     buildBars(h, ci);
     addLog(locName, usAqi, lat, lng);
+
+    // Weather waveform chart
+    if (weatherData?.hourly) {
+        State.weather = weatherData;
+        const wci = currentIdx(weatherData.hourly.time);
+        updateWeatherWaveTabs();
+        drawWeatherWave(weatherData.hourly.time, weatherData.hourly[State.weatherWaveKey], wci, State.weatherWaveKey);
+    }
+
     setStatus(`SCAN COMPLETE — US AQI ${usAqi} — ${lv.label}`, lv.lv >= 3 ? 'rd' : lv.lv >= 1 ? 'or' : 'gr');
     
     termLog(`SCAN OK — US AQI ${usAqi} [${lv.label}] — ${locName.split(',')[0]}`, 'system');
@@ -218,4 +227,30 @@ export function updateCenterCard(name, lat, lng) {
     if (coordsEl) coordsEl.textContent =
         `${parseFloat(lat).toFixed(4)}°N  ${parseFloat(lng).toFixed(4)}°E`;
     card.style.display = 'block';
+}
+
+export function initTerminalTabs() {
+    const tabs = document.querySelectorAll('.term-tab');
+    const output = document.getElementById('terminal-output');
+    const scanlog = document.getElementById('scan-log');
+    const clearBtn = document.getElementById('clear-btn');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            if (target === 'output') {
+                if (output) output.style.display = '';
+                if (scanlog) scanlog.style.display = 'none';
+                if (clearBtn) clearBtn.style.display = 'none';
+            } else {
+                if (output) output.style.display = 'none';
+                if (scanlog) scanlog.style.display = '';
+                if (clearBtn) clearBtn.style.display = '';
+            }
+        });
+    });
 }

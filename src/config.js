@@ -76,6 +76,23 @@ export const Config = {
     },
 };
 
+// --- WEATHER WAVEFORM CONFIG ---
+Config.WEATHER_WAVE_COLS = {
+    temperature_2m:      '#FF6B6B',
+    wind_speed_10m:      '#20F0FF',
+    relative_humidity_2m:'#4ECDC4',
+    surface_pressure:    '#C49CFF',
+    cloud_cover:         '#8899AA',
+};
+
+Config.WEATHER_UNITS = {
+    temperature_2m:      '°C',
+    wind_speed_10m:      'km/h',
+    relative_humidity_2m:'%',
+    surface_pressure:    'hPa',
+    cloud_cover:         '%',
+};
+
 // --- WMO WEATHER CODE LOOKUP ---
 /**
  * Maps WMO weather interpretation codes (from Open-Meteo) to human-readable labels.

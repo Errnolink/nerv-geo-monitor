@@ -28,6 +28,9 @@ export const State = {
     /** @type {number} Current waveform zoom scale factor */
     waveScale: 1,
 
+    /** @type {string} Currently selected weather waveform key */
+    weatherWaveKey: 'temperature_2m',
+
     /** @type {Array<string>} Terminal output line history */
     terminalLines: [],
 };

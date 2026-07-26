@@ -13,11 +13,6 @@
    ============================================================ */
 @media (max-width: 900px) {
 
-    /* Hide center card on mobile — no space for it */
-    .hud-center-card {
-        display: none !important;
-    }
-
     /* --- Hide right scan log panel by default --- */
     #hud-right {
         display: none;
@@ -122,6 +117,11 @@
     .vbw {
         min-width: 54px;
     }
+    /* --- Hide center card on mobile --- */
+    .hud-center-card {
+        display: none !important;
+    }
+
 }
 
 /* ============================================================
@@ -151,4 +151,9 @@
     .logo-sub {
         font-size: 8px;
     }
+    /* --- Hide center card on small mobile --- */
+    .hud-center-card {
+        display: none !important;
+    }
+
 }
