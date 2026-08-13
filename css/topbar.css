@@ -27,7 +27,7 @@
     flex-shrink: 0;
 }
 
-:.logo {
+.logo {
     font-family: var(--stamp);
     font-weight: 800;
     font-size: 28px;

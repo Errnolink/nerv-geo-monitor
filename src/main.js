@@ -8,19 +8,10 @@ import { initClock } from './ui/clock.js';
 import { setStatus, showErr } from './ui/status-bar.js';
 import { initTerminal, termLog, bootSequence } from './ui/terminal.js';
 import { createCommandHandler } from './ui/terminal-commands.js';
-import { renderData, clearLog, initMobileTabs, initTerminalTabs } from './ui/panels.js';
+import { renderData, clearLog, initMobileTabs, initTerminalTabs, currentIdx } from './ui/panels.js';
 import { updateWaveTabs, drawWave, updateWeatherWaveTabs, drawWeatherWave } from './ui/chart.js';
 
 let _initScanComplete = false;
-
-function _weatherCurrentIdx(times) {
-    const n = new Date();
-    const pad = x => String(x).padStart(2, '0');
-    const t = `${n.getFullYear()}-${pad(n.getMonth() + 1)}-${pad(n.getDate())}T${pad(n.getHours())}:00`;
-    let b = 0;
-    times.forEach((v, i) => { if (v <= t) b = i; });
-    return b;
-}
 
 function parseCoords(s) {
     const m = s.trim().match(/^(-?\d+\.?\d*)\s*[,\s]+\s*(-?\d+\.?\d*)$/);
@@ -28,12 +19,11 @@ function parseCoords(s) {
 }
 
 export async function doScan(lat, lng, name) {
+    // setStatus owns #sys-stat, #alert-text and #alert-led — writing to
+    // #sys-stat directly here just fought with it and left the readout stuck
+    // orange after the scan finished.
     setStatus(`SCANNING ${name.split(',')[0].toUpperCase()}...`, 'or');
-    if ($('sys-stat')) {
-        $('sys-stat').textContent = 'SCANNING'; 
-        $('sys-stat').style.color = 'var(--or)';
-    }
-    
+
     try {
         const [d, w] = await Promise.all([
             fetchAirQuality(lat, lng),
@@ -64,14 +54,29 @@ export async function startScan(raw) {
     }
 }
 
+/**
+ * Re-size and re-draw both waveforms.
+ *
+ * The AQI chart width tracks the container times the zoom scale. It used to be
+ * clamped to a 600px floor, which meant the 320px panel was permanently
+ * scrolled sideways at 1× and the chart visibly jumped the first time the
+ * window resized. The floor is now the container itself.
+ */
 function updateWaveSize() {
     const wi = $('wave-inner');
-    if (!wi) return;
-    const W = wi.clientWidth * State.waveScale;
-    const svg = $('wave-svg');
-    if (svg) svg.style.width = Math.max(600, W) + 'px';
-    if (State.data && State.data.hourly) {
-        drawWave(State.data.hourly.time, State.data.hourly[State.waveKey], State.ci, State.waveKey);
+    if (wi) {
+        const svg = $('wave-svg');
+        if (svg) svg.style.width = (wi.clientWidth * State.waveScale) + 'px';
+        if (State.data?.hourly) {
+            drawWave(State.data.hourly.time, State.data.hourly[State.waveKey], State.ci, State.waveKey);
+        }
+    }
+
+    // The weather chart was never redrawn on resize, so its viewBox stayed at
+    // the width it was first rendered at and the trace came out stretched.
+    const wh = State.weather?.hourly;
+    if (wh?.time) {
+        drawWeatherWave(wh.time, wh[State.weatherWaveKey], currentIdx(wh.time), State.weatherWaveKey);
     }
 }
 
@@ -83,11 +88,12 @@ async function init() {
         { text: '████████████████████████████████████████', type: 'system' },
         { text: 'Initializing subsystems...', type: 'info' },
         { text: '  ├─ MapLibre GL JS ............... OK', type: 'info' },
-        { text: '  ├─ Protomaps Vector Tiles ....... OK', type: 'info' },
         { text: '  ├─ Open-Meteo AQI Uplink ........ OK', type: 'info' },
         { text: '  ├─ Open-Meteo Weather Uplink .... OK', type: 'info' },
-        { text: '  └─ Terminal Interface ........... OK', type: 'info' },
-        { text: 'All systems nominal. Awaiting input.', type: 'system' },
+        { text: '  ├─ Terminal Interface ........... OK', type: 'info' },
+        // The tile layer reports its own OK/FAIL from map.js once the style
+        // actually resolves — it used to be hard-coded OK even when the map
+        // was black.
     ], 60);
 
     initClock();
@@ -121,8 +127,7 @@ async function init() {
             State.weatherWaveKey = btn.dataset.wwk;
             updateWeatherWaveTabs();
             const wh = State.weather.hourly;
-            const wci = _weatherCurrentIdx(wh.time);
-            drawWeatherWave(wh.time, wh[State.weatherWaveKey], wci, State.weatherWaveKey);
+            drawWeatherWave(wh.time, wh[State.weatherWaveKey], currentIdx(wh.time), State.weatherWaveKey);
         });
     });
 

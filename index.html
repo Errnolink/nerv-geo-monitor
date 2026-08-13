@@ -146,22 +146,17 @@
 
 
 
-  <!-- ═══ LAYER 2: Center Floating Location Card ═══ -->
   <!--
-    Visibility controlled by JS (updateCenterCard in panels.js).
-    Starts hidden. Appears over map center after first scan.
-    pointer-events: none — so it never blocks map click-to-scan.
+    The floating location readout lives on the map itself as a MapLibre popup
+    anchored to the marker (see .nerv-popup in css/hud.css). A second fixed
+    card here duplicated the same name and coordinates, with a connector line
+    that pointed at nothing.
   -->
-  <div id="hud-center" class="hud-center-card" style="display:none;">
-    <div class="hcc-label" id="hcc-loc">—</div>
-    <div class="hcc-coords" id="hcc-coords">—</div>
-    <div class="hcc-connector"></div>
-  </div>
 
   <!-- ═══ Mobile tab navigation (hidden above 900px) ═══ -->
   <div id="mobile-tabs">
-    <button class="mtab act" data-mt="left">DATA</button>
-    <button class="mtab" data-mt="right">LOG</button>
+    <button class="mtab act" data-mt="left">AQI</button>
+    <button class="mtab" data-mt="right">WEATHER</button>
   </div>
 
   <!-- ═══ LAYER 3: Bottom Terminal Dock ═══ -->

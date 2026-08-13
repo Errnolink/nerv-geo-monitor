@@ -5,7 +5,13 @@ import { setStatus } from './status-bar.js';
 import { updateWaveTabs, drawWave, updateWeatherWaveTabs, drawWeatherWave } from './chart.js';
 import { termLog } from './terminal.js';
 
-function currentIdx(times) {
+/**
+ * Index of the hour closest to (but not after) now within an Open-Meteo
+ * `hourly.time` array. Shared by the AQI and weather series.
+ * @param {string[]} times
+ * @returns {number}
+ */
+export function currentIdx(times) {
     const n = new Date();
     const pad = x => String(x).padStart(2, '0');
     const t = `${n.getFullYear()}-${pad(n.getMonth() + 1)}-${pad(n.getDate())}T${pad(n.getHours())}:00`;
@@ -141,7 +147,13 @@ export function clearLog() {
 
 export function initMobileTabs() {
     const tabs = document.querySelectorAll('.mtab');
-    
+
+    // Sync body state to whichever tab is marked active in the markup.
+    // Without this the DATA tab renders as selected while `show-left` is
+    // absent, so no panel is visible at all on first load.
+    const initial = document.querySelector('.mtab.act');
+    if (initial) document.body.classList.add('show-' + initial.dataset.mt);
+
     tabs.forEach(t => {
         t.addEventListener('click', (e) => {
             const target = t.dataset.mt;
@@ -159,6 +171,50 @@ export function initMobileTabs() {
     });
 }
 
+/**
+ * Populate the six weather tiles and the weather waveform.
+ *
+ * Wind, pressure and cloud cover are not in Open-Meteo's `current` block for
+ * this request, so they are read from the hourly series at the current hour —
+ * previously those three tiles were never written to and sat on '—' forever.
+ *
+ * @param {Object|null} weatherData  Result of fetchWeather(), or null if it failed.
+ */
+function renderWeather(weatherData) {
+    const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+
+    if (!weatherData) {
+        // Weather fetch failed — clear the panel rather than leaving the
+        // previous location's readings on screen.
+        State.weather = null;
+        ['w-temp', 'w-humid', 'w-code', 'w-wind', 'w-press', 'w-cloud'].forEach(id => set(id, '—'));
+        const svg = $('weather-wave-svg');
+        if (svg) svg.innerHTML = '';
+        return;
+    }
+
+    State.weather = weatherData;
+
+    set('w-temp', weatherData.temperature != null ? weatherData.temperature.toFixed(1) : '—');
+    set('w-humid', weatherData.humidity ?? '—');
+    set('w-code', WEATHER_CODES[weatherData.weatherCode] || 'CODE ' + weatherData.weatherCode);
+
+    const wh = weatherData.hourly;
+    if (!wh?.time) return;
+
+    const wci = currentIdx(wh.time);
+    const at = key => {
+        const v = wh[key]?.[wci];
+        return v == null ? '—' : Math.round(v);
+    };
+    set('w-wind', at('wind_speed_10m'));
+    set('w-press', at('surface_pressure'));
+    set('w-cloud', at('cloud_cover'));
+
+    updateWeatherWaveTabs();
+    drawWeatherWave(wh.time, wh[State.weatherWaveKey], wci, State.weatherWaveKey);
+}
+
 export function renderData(aqiData, weatherData, locName, lat, lng) {
     State.data = aqiData; 
     const h = aqiData.hourly, times = h.time;
@@ -169,7 +225,10 @@ export function renderData(aqiData, weatherData, locName, lat, lng) {
     const lv = Config.getLv(usAqi), dom = getDom(h, ci);
     const uv = h.uv_index?.[ci], now = new Date(times[ci]);
 
-    document.body.className = `lv${lv.lv}`;
+    // Swap only the severity class — `show-left` / `show-right` drive the
+    // mobile panel visibility and must survive a scan.
+    document.body.classList.remove('lv0', 'lv1', 'lv2', 'lv3', 'lv4', 'lv5');
+    document.body.classList.add(`lv${lv.lv}`);
     document.documentElement.style.setProperty('--ac', lv.col);
 
     if ($('c-aqi')) $('c-aqi').textContent = usAqi;
@@ -180,7 +239,6 @@ export function renderData(aqiData, weatherData, locName, lat, lng) {
         $('c-loc').textContent = locName.split(',').slice(0, 2).join(',');
         $('c-loc').style.color = lv.col;
     }
-    if ($('c-coords')) $('c-coords').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
     if ($('c-ts')) $('c-ts').textContent = now.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
     if ($('c-dom')) $('c-dom').textContent = dom; 
     if ($('c-eaqi')) $('c-eaqi').textContent = euAqi + ' (EU)';
@@ -194,9 +252,7 @@ export function renderData(aqiData, weatherData, locName, lat, lng) {
         }
     }
 
-    if ($('w-temp')) $('w-temp').textContent = weatherData ? weatherData.temperature.toFixed(1) : '—';
-    if ($('w-humid')) $('w-humid').textContent = weatherData ? weatherData.humidity : '—';
-    if ($('w-code')) $('w-code').textContent = weatherData ? (WEATHER_CODES[weatherData.weatherCode] || 'CODE ' + weatherData.weatherCode) : '—';
+    renderWeather(weatherData);
 
     updateMarker(lat, lng, lv.col);
     updateWaveTabs();
@@ -204,33 +260,12 @@ export function renderData(aqiData, weatherData, locName, lat, lng) {
     buildBars(h, ci);
     addLog(locName, usAqi, lat, lng);
 
-    // Weather waveform chart
-    if (weatherData?.hourly) {
-        State.weather = weatherData;
-        const wci = currentIdx(weatherData.hourly.time);
-        updateWeatherWaveTabs();
-        drawWeatherWave(weatherData.hourly.time, weatherData.hourly[State.weatherWaveKey], wci, State.weatherWaveKey);
-    }
-
     setStatus(`SCAN COMPLETE — US AQI ${usAqi} — ${lv.label}`, lv.lv >= 3 ? 'rd' : lv.lv >= 1 ? 'or' : 'gr');
     
     termLog(`SCAN OK — US AQI ${usAqi} [${lv.label}] — ${locName.split(',')[0]}`, 'system');
-    updateCenterCard(locName, lat, lng);
-}
 
-export async function updateCenterCard(name, lat, lng) {
-    // Drive the floating #hud-center card
-    const card = document.getElementById('hud-center');
-    const locEl = document.getElementById('hcc-loc');
-    const coordsEl = document.getElementById('hcc-coords');
-    if (!card) return;
-    if (locEl) locEl.textContent = name.split(',')[0].toUpperCase().trim();
-    if (coordsEl) coordsEl.textContent =
-        `${parseFloat(lat).toFixed(4)}°N  ${parseFloat(lng).toFixed(4)}°E`;
-    card.style.display = 'block';
-    // Also update the MapLibre popup on the marker
-    const { updatePopup } = await import('../map/marker.js');
-    updatePopup(name, lat, lng);
+    // Location readout on the map, anchored to the marker.
+    updatePopup(locName, lat, lng);
 }
 
 export function initTerminalTabs() {

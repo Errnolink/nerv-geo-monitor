@@ -110,7 +110,15 @@ export function drawWave(times, vals, ci, waveKey) {
 
     const pd = { l: 40, r: 20, t: 15, b: 24 };
     const iW = W - pd.l - pd.r, iH = H - pd.t - pd.b;
-    const maxV = Math.max(...sl.filter(v => v != null), 150);
+
+    // The 150 floor exists so the US AQI threshold bands stay on screen at low
+    // readings. Applying it to raw pollutants too squashed every trace into the
+    // bottom few pixels — PM2.5 rarely exceeds 40 µg/m³ against a 150 ceiling.
+    const present = sl.filter(v => v != null);
+    const maxV = isAqi
+        ? Math.max(...present, 150)
+        : Math.max(...present, Config.PI[waveKey]?.who ?? 0, 1);
+
     const ys = v => v == null ? null : pd.t + iH - (v / (maxV * 1.15)) * iH;
     const xs = i => pd.l + (i / (N - 1)) * iW;
     const ni = ci - s, lv = Config.getLv(isAqi ? (sl[ni] || 0) : 50);
@@ -136,19 +144,20 @@ export function drawWave(times, vals, ci, waveKey) {
     // Threshold lines
     if (isAqi) {
         [50, 100, 150, 200, 250].forEach(v => {
-            const y = ys(v); if (!y || y < pd.t) return;
+            // `!y` also rejected a legitimate y of 0
+            const y = ys(v); if (y == null || y < pd.t) return;
             const c = v <= 50 ? '#50FF50' : v <= 150 ? '#FF8A00' : v <= 200 ? '#FF2A2A' : '#B020FF';
             content += `<line x1="${pd.l}" y1="${y.toFixed(1)}" x2="${W - pd.r}" y2="${y.toFixed(1)}" stroke="${c}" stroke-opacity=".15" stroke-width="1" stroke-dasharray="4,4"/>
       <text x="${(pd.l - 6).toFixed(1)}" y="${(y + 4).toFixed(1)}" font-size="11" fill="${c}" fill-opacity="0.5" text-anchor="end" font-family="IBM Plex Mono" font-weight="700">${v}</text>`;
         });
     } else {
         if (whoVal) {
-            const yw = ys(whoVal); if (yw && yw >= pd.t) {
+            const yw = ys(whoVal); if (yw != null && yw >= pd.t) {
                 content += `<line x1="${pd.l}" y1="${yw.toFixed(1)}" x2="${W - pd.r}" y2="${yw.toFixed(1)}" stroke="#FF2A2A" stroke-opacity=".5" stroke-width="1" stroke-dasharray="4,3"/>
       <text x="${(pd.l - 6).toFixed(1)}" y="${(yw + 4).toFixed(1)}" font-size="11" fill="#FF2A2A" fill-opacity="0.8" text-anchor="end" font-family="IBM Plex Mono" font-weight="700">WHO</text>`;
             }
         }
-        const ym = ys(maxV); if (ym && ym >= pd.t) {
+        const ym = ys(maxV); if (ym != null && ym >= pd.t) {
             content += `<text x="${(pd.l - 6).toFixed(1)}" y="${(ym + 4).toFixed(1)}" font-size="11" fill="${waveColHex}" fill-opacity="0.6" text-anchor="end" font-family="IBM Plex Mono">${maxV.toFixed(0)}</text>`;
         }
     }
@@ -181,6 +190,8 @@ export function drawWeatherWave(times, vals, ci, waveKey) {
 
     // For weather data, handle potential negative values (temperature)
     const filtered = sl.filter(v => v != null);
+    // All-null window would make Math.min/max return ±Infinity and blank the chart with NaN
+    if (!filtered.length) { svg.innerHTML = ''; return; }
     const minV = Math.min(...filtered);
     const maxV = Math.max(...filtered);
     const range = maxV - minV || 1;

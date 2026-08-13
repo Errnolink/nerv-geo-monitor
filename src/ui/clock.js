@@ -12,7 +12,8 @@ import { $ } from '../state.js';
  */
 export function initClock() {
     const update = () => {
-        $('clk').textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
+        const el = $('clk');
+        if (el) el.textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
     };
     update();
     setInterval(update, 1000);

@@ -13,36 +13,35 @@
    ============================================================ */
 @media (max-width: 900px) {
 
-    /* --- Hide right scan log panel by default --- */
-    #hud-right {
-        display: none;
+    /* The terminal is taller on mobile and a 40px tab bar sits above it.
+       Both must be reflected in the token that every fixed element anchors
+       to, otherwise the tab bar and the hazard border overlap the panels. */
+    :root {
+        --terminal-height: 160px;
+        --mobile-tabs-height: 40px;
     }
 
-    /* --- Full-width left panel --- */
-    #hud-left {
+    /* --- Full-width panels, clearing the terminal AND the tab bar --- */
+    #hud-left,
+    #hud-right {
         left: var(--hud-gap);
         right: var(--hud-gap);
         width: auto;
         top: calc(var(--topbar-height) + 6px + var(--hud-gap));
-        bottom: calc(var(--terminal-height) + 6px + var(--hud-gap));
+        bottom: calc(
+            var(--terminal-height) + var(--mobile-tabs-height) + 6px + var(--hud-gap)
+        );
     }
 
-    /* Full-width chart wave inner panel inside hud-left on mobile is automatic. */
-
     /* --- Hide panels by default; show via body classes toggled by JS --- */
-    #hud-left {
+    #hud-left,
+    #hud-right {
         display: none;
     }
 
-    body.show-left #hud-left {
-        display: flex;
-    }
-
+    body.show-left #hud-left,
     body.show-right #hud-right {
         display: flex;
-        left: var(--hud-gap);
-        right: var(--hud-gap);
-        width: auto;
     }
 
     /* --- Mobile tab bar sits above the terminal --- */
@@ -52,7 +51,7 @@
         bottom: var(--terminal-height);
         left: 0;
         right: 0;
-        height: 40px;
+        height: var(--mobile-tabs-height);
         z-index: var(--z-terminal);
         background: var(--panel);
         border-top: 1px solid var(--border);
@@ -97,9 +96,18 @@
         font-size: 24px;
     }
 
-    /* --- Narrow terminal --- */
-    #terminal {
-        height: 160px;
+    /* The hazard stripe and error toast must clear the tab bar too —
+       both previously anchored to the terminal alone and sat underneath it. */
+    .hazard-border-bot {
+        bottom: calc(var(--terminal-height) + var(--mobile-tabs-height));
+    }
+
+    #err-box {
+        bottom: calc(var(--terminal-height) + var(--mobile-tabs-height) + 14px);
+        left: var(--hud-gap);
+        right: var(--hud-gap);
+        transform: none;
+        white-space: normal;
     }
 
     .aqi-big-wrap {
@@ -116,10 +124,6 @@
 
     .vbw {
         min-width: 54px;
-    }
-    /* --- Hide center card on mobile --- */
-    .hud-center-card {
-        display: none !important;
     }
 
 }
@@ -150,10 +154,6 @@
 
     .logo-sub {
         font-size: 8px;
-    }
-    /* --- Hide center card on small mobile --- */
-    .hud-center-card {
-        display: none !important;
     }
 
 }

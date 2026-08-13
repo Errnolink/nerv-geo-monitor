@@ -17,7 +17,7 @@
 }
 
 /* ============================================================
-   HUD RIGHT — Weather + Scan Log Panel
+   HUD RIGHT — Weather Data Panel (the scan log lives in the terminal dock)
    ============================================================ */
 #hud-right {
     position: fixed;
@@ -29,51 +29,6 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-}
-
-/* ============================================================
-   HUD CENTER — Floating location card over map
-   pointer-events: none so it never blocks map click-to-scan
-   ============================================================ */
-.hud-center-card {
-    position: fixed;
-    top: calc(var(--topbar-height) + 6px + var(--hud-gap));
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: var(--z-hud);
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--border);
-    border-top: 2px solid var(--cy);
-    padding: 10px 18px;
-    pointer-events: none;
-    min-width: 200px;
-    text-align: center;
-}
-
-.hcc-label {
-    font-family: var(--stamp);
-    font-size: 16px;
-    letter-spacing: 3px;
-    color: var(--or);
-    text-transform: uppercase;
-}
-
-.hcc-coords {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--cy);
-    letter-spacing: 1px;
-    margin-top: 4px;
-}
-
-/* Thin vertical connector line pointing down toward the marker */
-.hcc-connector {
-    width: 1px;
-    height: 24px;
-    background: linear-gradient(to bottom, var(--cy), transparent);
-    margin: 6px auto 0;
 }
 
 /* ============================================================
@@ -462,7 +417,8 @@
     padding: 12px 24px;
     font-size: 14px;
     display: none;
-    white-space: nowrap;
+    /* Long API errors used to run off both edges of the viewport */
+    max-width: min(560px, calc(100vw - 32px));
     box-shadow: 0 0 20px rgba(255, 42, 42, 0.35);
     font-weight: 700;
     letter-spacing: 1px;

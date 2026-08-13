@@ -1,4 +1,4 @@
-import { termLog } from './terminal.js';
+import { termLog, clearTerminal } from './terminal.js';
 
 export function createCommandHandler(actions) {
     return async function handleCommand(raw) {
@@ -10,11 +10,11 @@ export function createCommandHandler(actions) {
             termLog('  <lat,lng>   Scan location by coordinates', 'info');
             termLog('  clear       Clear terminal output', 'info');
             termLog('  clearlog    Clear scan log panel', 'info');
+            termLog('Keys: / focus input · ↑↓ browse suggestions · Tab accept', 'info');
             return;
         }
         
         if (cmd === 'clear') {
-            const { clearTerminal } = await import('./terminal.js');
             clearTerminal();
             return;
         }
@@ -31,18 +31,22 @@ export function createCommandHandler(actions) {
         if (coordMatch) {
             const lat = parseFloat(coordMatch[1]);
             const lng = parseFloat(coordMatch[2]);
-            termLog(`Initiating scan at coordinates: ${lat}, ${lng}`, 'info');
-            if (actions && actions.startScan) {
-                actions.startScan(raw);
+            // Out-of-range coordinates otherwise reach the API and come back
+            // as an opaque HTTP error.
+            if (Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+                termLog(`ERR: coordinates out of range — lat ±90, lng ±180`, 'error');
+                return;
             }
+            termLog(`Initiating scan at coordinates: ${lat}, ${lng}`, 'info');
+            if (actions?.startScan) await actions.startScan(raw);
             return;
         }
-        
+
+        // startScan is async — the previous try/catch wrapped the call without
+        // awaiting it, so a rejected promise escaped it entirely.
         try {
             termLog(`Searching coordinates for: ${raw}...`, 'info');
-            if (actions && actions.startScan) {
-                actions.startScan(raw);
-            }
+            if (actions?.startScan) await actions.startScan(raw);
         } catch (e) {
             termLog(`ERR: UPLINK FAILED — ${e.message}`, 'error');
         }

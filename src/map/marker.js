@@ -20,6 +20,9 @@ let currentMarker = null;
  * @param {string} cssColorVar   A CSS variable string such as `'var(--gr)'`.
  */
 export function updateMarker(lat, lng, cssColorVar) {
+    // Map may have failed to initialise — the rest of the HUD still works.
+    if (!MapCtrl.map) return;
+
     // Remove existing marker from the map
     if (currentMarker) {
         currentMarker.remove();
@@ -100,7 +103,7 @@ export function updatePopup(name, lat, lng) {
     _dismissed = false;
 
     const displayName = name.split(',')[0].toUpperCase().trim();
-    const coords = `${parseFloat(lat).toFixed(4)}°N  ${parseFloat(lng).toFixed(4)}°E`;
+    const coords = `${lat.toFixed(4)}°${lat >= 0 ? 'N' : 'S'}  ${lng.toFixed(4)}°${lng >= 0 ? 'E' : 'W'}`;
 
     _popup = new maplibregl.Popup({
         closeButton: true,
